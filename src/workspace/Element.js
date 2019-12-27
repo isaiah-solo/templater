@@ -1,14 +1,22 @@
 // @flow strict
 
 import React from 'react';
-import './Workspace.css';
 
 type Props = $ReadOnly<{||}>;
 
 function Element(_: Props): React.Element<'div'> {
   return (
-    <div className="Workspace-element" />
+    <div style={styles.root} />
   );
 }
+
+const styles = {
+  root: {
+    backgroundColor: '#ee0060',
+    boxSizing: 'border-box',
+    height: 40,
+    width: '100%',
+  },
+};
 
 export default Element;

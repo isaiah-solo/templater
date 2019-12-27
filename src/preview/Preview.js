@@ -1,12 +1,22 @@
+// @flow strict
+
 import React from 'react';
-import './Preview.css';
 
 type Props = $ReadOnly<{||}>;
 
 function Preview(_: Props): React.Element<'div'> {
   return (
-    <div className="Preview-root" />
+    <div style={styles.root} />
   );
 }
+
+const styles = {
+  root: {
+    backgroundColor: 'white',
+    boxShadow: 'rgba(0, 0, 0, 0.05) 0 2px 16px -2px',
+    height: '100%',
+    width: '100%',
+  },
+};
 
 export default Preview;
