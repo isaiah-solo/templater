@@ -2,6 +2,7 @@
 
 import React, { useCallback, useReducer } from 'react';
 import Preview from './preview/Preview';
+import Toolbar from './toolbar/Toolbar';
 import Workspace from './workspace/Workspace';
 import './App.css';
 
@@ -57,6 +58,7 @@ function App(_: Props): React.Element<'div'> {
   ), []);
   return (
     <div className="App-root">
+      <Toolbar />
       <Workspace items={items} />
       <Preview />
     </div>

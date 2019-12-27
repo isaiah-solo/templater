@@ -1,0 +1,26 @@
+.Toolbar-root {
+  box-sizing: border-box;
+  display: grid;
+  grid-auto-flow: row;
+  grid-row-gap: 12px;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(auto-fill, 200px);
+  height: 100%;
+  width: 200px;
+}
+
+.Toolbar-item {
+  align-items: center;
+  background-color: #ee0060;
+  box-sizing: border-box;
+  color: white;
+  display: flex;
+  height: 200px;
+  justify-content: center;
+  text-align: center;
+  width: 200px;
+}
+
+.Toolbar-itemText {
+  font-size: 24px;
+}

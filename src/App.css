@@ -4,14 +4,8 @@
   display: grid;
   grid-auto-flow: column;
   grid-gap: 20px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr 1fr;
   height: 100vh;
   padding: 20px;
   width: 100vw;
-}
-
-.App-preview {
-  background-color: white;
-  height: 100%;
-  width: 100%;
 }
