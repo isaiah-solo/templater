@@ -4,7 +4,6 @@ import React, { useCallback, useReducer } from 'react';
 import Preview from './preview/Preview';
 import Toolbar from './toolbar/Toolbar';
 import Workspace from './workspace/Workspace';
-import './App.css';
 
 type Item = $ReadOnly<{|
   type: string,
@@ -57,12 +56,26 @@ function App(_: Props): React.Element<'div'> {
     }
   ), []);
   return (
-    <div className="App-root">
+    <div style={styles.root}>
       <Toolbar />
       <Workspace items={items} />
       <Preview />
     </div>
   );
 }
+
+const styles = {
+  root: {
+    backgroundColor: '#202020',
+    boxSizing: 'border-box',
+    display: 'grid',
+    gridAutoFlow: 'column',
+    gridGap: 20,
+    gridTemplateColumns: 'auto 1fr 1fr',
+    height: '100vh',
+    padding: 20,
+    width: '100vw',
+  },
+};
 
 export default App;
