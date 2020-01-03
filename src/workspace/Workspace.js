@@ -1,20 +1,23 @@
 // @flow strict
 
-import React from 'react';
-import Element from './Element.js';
+import type {Element} from 'react';
+import type {Item} from '../reducer/workspaceItemReducer';
+import React, {useMemo} from 'react';
+import WorkplaceElement from './WorkplaceElement.js';
+import useWorkspaceItems from '../reducer/useWorkspaceItems';
 
-type Item = $ReadOnly<{|
-  type: string,
-|}>;
-
-type Props = $ReadOnly<{|
-  items: Array<Item>,
-|}>;
-
-function Workspace({items}: Props): React.Element<'div'> {
-  const itemElements = items.map((item: Item): React.Element<typeof Element> => <Element />);
+function Workspace(): Element<'div'> {
+  const {addItem, items} = useWorkspaceItems();
+  const itemElements = useMemo(
+    (): Array<Element<typeof WorkplaceElement>> => (
+      items.map((item: Item, index: number): Element<typeof WorkplaceElement> => (
+        <WorkplaceElement key={index} />
+      ))
+    ),
+    [items],
+  );
   return (
-    <div style={styles.root}>
+    <div onClick={addItem({type: 'text'}).toEnd()} style={styles.root}>
       {itemElements}
     </div>
   );

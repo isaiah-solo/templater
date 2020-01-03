@@ -1,14 +1,25 @@
 // @flow strict
 
+import type {Element} from 'react';
 import React from 'react';
+import useDrag from '../hook/useDrag';
 
-type Props = $ReadOnly<{||}>;
-
-function Toolbar(_: Props): React.Element<'div'> {
+function Toolbar(): Element<'div'> {
+  const {select, selected, selectedX, selectedY} = useDrag();
   return (
     <div style={styles.root}>
-      <div style={styles.item}>
-        <div style={styles.itemText}>Text</div>
+      {selected &&
+        <div style={{
+          ...styles.item,
+          ...styles.itemCopy,
+          left: selectedX,
+          top: selectedY,
+        }}>
+          <div>Text</div>
+        </div>
+      }
+      <div onMouseDown={select} style={styles.item}>
+        Text
       </div>
     </div>
   );
@@ -31,13 +42,16 @@ const styles = {
     boxSizing: 'border-box',
     color: 'white',
     display: 'flex',
+    fontSize: 24,
     height: 200,
     justifyContent: 'center',
     textAlign: 'center',
+    userSelect: 'none',
     width: 200,
   },
-  itemText: {
-    fontSize: 24,
+  itemCopy: {
+    backgroundColor: 'blue',
+    position: 'fixed',
   },
 };
 

@@ -1,10 +1,11 @@
 // @flow strict
 
+import type {Element} from 'react';
 import React from 'react';
 
 type Props = $ReadOnly<{||}>;
 
-function Preview(_: Props): React.Element<'div'> {
+function Preview(_: Props): Element<'div'> {
   return (
     <div style={styles.root} />
   );

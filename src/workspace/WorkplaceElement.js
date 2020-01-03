@@ -1,10 +1,9 @@
 // @flow strict
 
+import type {Element} from 'react';
 import React from 'react';
 
-type Props = $ReadOnly<{||}>;
-
-function Element(_: Props): React.Element<'div'> {
+function WorkplaceElement(): Element<'div'> {
   return (
     <div style={styles.root} />
   );
@@ -19,4 +18,4 @@ const styles = {
   },
 };
 
-export default Element;
+export default WorkplaceElement;
