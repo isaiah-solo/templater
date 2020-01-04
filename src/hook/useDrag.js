@@ -1,6 +1,19 @@
 // @flow strict
 
-import { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
+
+const throttle = (func, limit) => {
+  let inThrottle = false;
+  return function() {
+    const args = arguments;
+    const context = this;
+    if (!inThrottle) {
+      func.apply(context, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  }
+}
 
 function useDrag() {
   const [selected, setSelected] = useState<boolean>(false);
@@ -9,44 +22,50 @@ function useDrag() {
   const [offsetX, setOffsetX] = useState<?number>(null);
   const [offsetY, setOffsetY] = useState<?number>(null);
   const dragItem = useCallback(
-    (e: SyntheticMouseEvent<>): void => {
-      const selectedX = e.clientX - (offsetX != null ? offsetX : 0);
-      const selectedY = e.clientY - (offsetY != null ? offsetY : 0);
-      setSelectedX(selectedX);
-      setSelectedY(selectedY);
-    },
-    [offsetX, offsetY, setSelectedX, setSelectedY],
+    throttle((e: SyntheticMouseEvent<>): void => {
+      if (!selected || offsetX == null || offsetY == null) {
+        return;
+      }
+      const newSelectedX = e.clientX - offsetX;
+      const newSelectedY = e.clientY - offsetY;
+      if (newSelectedX === selectedX && newSelectedY === selectedY) {
+        return;
+      }
+      setSelectedX(newSelectedX);
+      setSelectedY(newSelectedY);
+    }, 100),
+    [selected, selectedX, selectedY, setSelectedX, setSelectedY, offsetX, offsetY]
   );
   const dropItem = useCallback(
-    (e: SyntheticMouseEvent<>): void => {
+    (_: SyntheticMouseEvent<>): void => {
       setOffsetX(null);
       setOffsetY(null);
       setSelected(false);
       setSelectedX(null);
       setSelectedY(null);
+      window.removeEventListener('mousemove', dragItem, true);
+      window.removeEventListener('mouseup', dropItem, true);
     },
-    [setOffsetX, setOffsetY, setSelected, setSelectedX, setSelectedY],
+    [dragItem, setOffsetX, setOffsetY, setSelected, setSelectedX, setSelectedY],
   );
   const select = useCallback(
     (e: SyntheticMouseEvent<>): void => {
-      const offsetX = e.nativeEvent.offsetX;
-      const offsetY = e.nativeEvent.offsetY;
-      setOffsetX(offsetX);
-      setOffsetY(offsetY);
+      const target: HTMLDivElement = (e.target: any);
+      const newOffsetX = e.clientX - target.offsetTop;
+      const newOffsetY = e.clientY - target.offsetLeft;
+      setOffsetX(newOffsetX);
+      setOffsetY(newOffsetY);
       setSelected(true);
-      setSelectedX(e.clientX - offsetX);
-      setSelectedY(e.clientY - offsetY);
+      setSelectedX(e.clientX - newOffsetX);
+      setSelectedY(e.clientY - newOffsetY);
     },
     [setOffsetX, setOffsetY, setSelected, setSelectedX, setSelectedY],
   );
   useEffect(
     (): void => {
       if (selected) {
-        window.addEventListener('mouseup', dropItem);
-        window.addEventListener('mousemove', dragItem);
-      } else {
-        window.removeEventListener('mouseup', dropItem);
-        window.removeEventListener('mousemove', dragItem);
+        window.addEventListener('mouseup', dropItem, true);
+        window.addEventListener('mousemove', dragItem, true);
       }
     },
     [dragItem, dropItem, selected],

@@ -15,7 +15,7 @@ function Toolbar(): Element<'div'> {
           left: selectedX,
           top: selectedY,
         }}>
-          <div>Text</div>
+          Text
         </div>
       }
       <div onMouseDown={select} style={styles.item}>
