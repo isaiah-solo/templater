@@ -25,12 +25,12 @@ const useDrag = (): DragReturn => {
   const throttle = useThrottle();
   const dragItem = useCallback(
     throttle(
-      (e: SyntheticMouseEvent<>): void => {
+      ({clientX, clientY}: SyntheticMouseEvent<>): void => {
         if (!isSelected || offsetX == null || offsetY == null) {
           return;
         }
-        setSelectedX(e.clientX - offsetX);
-        setSelectedY(e.clientY - offsetY);
+        setSelectedX(clientX - offsetX);
+        setSelectedY(clientY - offsetY);
       },
       100,
     ),
@@ -64,14 +64,14 @@ const useDrag = (): DragReturn => {
     ],
   );
   const select = useCallback(
-    (e: SyntheticMouseEvent<>): void => {
-      const target: HTMLDivElement = (e.target: any);
-      const newOffsetX = e.clientX - target.offsetTop;
-      const newOffsetY = e.clientY - target.offsetLeft;
+    ({clientX, clientY, target}: SyntheticMouseEvent<>): void => {
+      const {offsetLeft, offsetTop}: HTMLDivElement = (target: any);
+      const newOffsetX = clientX - offsetLeft;
+      const newOffsetY = clientY - offsetTop;
       setOffsetX(newOffsetX);
       setOffsetY(newOffsetY);
-      setSelectedX(e.clientX - newOffsetX);
-      setSelectedY(e.clientY - newOffsetY);
+      setSelectedX(clientX - newOffsetX);
+      setSelectedY(clientY - newOffsetY);
       startDrag();
     },
     [
