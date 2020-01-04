@@ -8,18 +8,17 @@ type ThrottledFunc = (func: any, limit: number) => ThrottleFunc;
 const useThrottle = (): ThrottledFunc => {
   const {
     isToggled: inThrottle,
-    toggleFalse: throttle,
-    toggleTrue: unthrottle
+    toggleFalse: unthrottle,
+    toggleTrue: throttle,
   } = useToggle(false);
   return (func: any, limit: number): ThrottleFunc => {
     return function(): void {
-      const args = arguments;
-      const context = this;
-      if (!inThrottle) {
-        func.apply(context, args);
-        throttle();
-        setTimeout(unthrottle, limit);
+      if (inThrottle) {
+        return;
       }
+      func.apply(this, arguments);
+      throttle();
+      setTimeout(unthrottle, limit);
     };
   };
 }

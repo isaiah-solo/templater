@@ -1,23 +1,32 @@
 // @flow strict
 
 import type {Element} from 'react';
-import React from 'react';
+import React, {useMemo} from 'react';
 import useDrag from '../hook/useDrag';
 
 function Toolbar(): Element<'div'> {
-  const {select, selected, selectedX, selectedY} = useDrag();
+  const {
+    isSelected,
+    select,
+    selectedX,
+    selectedY,
+  } = useDrag();
+  const hoverItem = useMemo(
+    (): Element<'div'> => (
+      <div style={{
+        ...styles.item,
+        ...styles.itemCopy,
+        left: selectedX,
+        top: selectedY,
+      }}>
+        Text
+      </div>
+    ),
+    [selectedX, selectedY],
+  );
   return (
     <div style={styles.root}>
-      {selected &&
-        <div style={{
-          ...styles.item,
-          ...styles.itemCopy,
-          left: selectedX,
-          top: selectedY,
-        }}>
-          Text
-        </div>
-      }
+      {isSelected && hoverItem}
       <div onMouseDown={select} style={styles.item}>
         Text
       </div>
