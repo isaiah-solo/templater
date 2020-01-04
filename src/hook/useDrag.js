@@ -1,40 +1,31 @@
 // @flow strict
 
 import {useCallback, useEffect, useState} from 'react';
+import useThrottle from './useThrottle';
 
-const throttle = (func, limit) => {
-  let inThrottle = false;
-  return function() {
-    const args = arguments;
-    const context = this;
-    if (!inThrottle) {
-      func.apply(context, args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
-    }
-  }
-}
+type DragReturn = $ReadOnly<{|
+  select: (e: SyntheticMouseEvent<>) => void,
+  selected: boolean,
+  selectedX: ?number,
+  selectedY: ?number,
+|}>;
 
-function useDrag() {
+const useDrag = (): DragReturn => {
   const [selected, setSelected] = useState<boolean>(false);
   const [selectedX, setSelectedX] = useState<?number>(null);
   const [selectedY, setSelectedY] = useState<?number>(null);
   const [offsetX, setOffsetX] = useState<?number>(null);
   const [offsetY, setOffsetY] = useState<?number>(null);
+  const throttle = useThrottle();
   const dragItem = useCallback(
     throttle((e: SyntheticMouseEvent<>): void => {
       if (!selected || offsetX == null || offsetY == null) {
         return;
       }
-      const newSelectedX = e.clientX - offsetX;
-      const newSelectedY = e.clientY - offsetY;
-      if (newSelectedX === selectedX && newSelectedY === selectedY) {
-        return;
-      }
-      setSelectedX(newSelectedX);
-      setSelectedY(newSelectedY);
+      setSelectedX(e.clientX - offsetX);
+      setSelectedY(e.clientY - offsetY);
     }, 100),
-    [selected, selectedX, selectedY, setSelectedX, setSelectedY, offsetX, offsetY]
+    [offsetX, offsetY, selected, selectedX, selectedY, setSelectedX, setSelectedY]
   );
   const dropItem = useCallback(
     (_: SyntheticMouseEvent<>): void => {
