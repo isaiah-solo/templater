@@ -7,9 +7,9 @@ import useToggle from './useToggle';
 
 type DragReturn = $ReadOnly<{|
   isSelected: boolean,
+  mouseX: ?number,
+  mouseY: ?number,
   select: (e: SyntheticMouseEvent<>) => void,
-  selectedX: ?number,
-  selectedY: ?number,
 |}>;
 
 const useDrag = (): DragReturn => {
@@ -18,67 +18,50 @@ const useDrag = (): DragReturn => {
     toggleFalse: endDrag,
     toggleTrue: startDrag,
   } = useToggle(false);
-  const [selectedX, setSelectedX] = useState<?number>(null);
-  const [selectedY, setSelectedY] = useState<?number>(null);
-  const [offsetX, setOffsetX] = useState<?number>(null);
-  const [offsetY, setOffsetY] = useState<?number>(null);
+  const [mouseX, setMouseX] = useState<?number>(null);
+  const [mouseY, setMouseY] = useState<?number>(null);
   const throttle = useThrottle();
   const dragItem = useCallback(
     throttle(
       ({clientX, clientY}: SyntheticMouseEvent<>): void => {
-        if (!isSelected || offsetX == null || offsetY == null) {
+        if (!isSelected) {
           return;
         }
-        setSelectedX(clientX - offsetX);
-        setSelectedY(clientY - offsetY);
+        setMouseX(clientX);
+        setMouseY(clientY);
       },
       100,
     ),
     [
       isSelected,
-      offsetX,
-      offsetY,
-      selectedX,
-      selectedY,
-      setSelectedX,
-      setSelectedY
+      setMouseX,
+      setMouseY,
     ],
   );
   const dropItem = useCallback(
     (_: SyntheticMouseEvent<>): void => {
       endDrag();
-      setOffsetX(null);
-      setOffsetY(null);
-      setSelectedX(null);
-      setSelectedY(null);
+      setMouseX(null);
+      setMouseY(null);
       window.removeEventListener('mousemove', dragItem, true);
       window.removeEventListener('mouseup', dropItem, true);
     },
     [
       dragItem,
       endDrag,
-      setOffsetX,
-      setOffsetY,
-      setSelectedX,
-      setSelectedY,
+      setMouseX,
+      setMouseY,
     ],
   );
   const select = useCallback(
-    ({clientX, clientY, target}: SyntheticMouseEvent<>): void => {
-      const {offsetLeft, offsetTop}: HTMLDivElement = (target: any);
-      const newOffsetX = clientX - offsetLeft;
-      const newOffsetY = clientY - offsetTop;
-      setOffsetX(newOffsetX);
-      setOffsetY(newOffsetY);
-      setSelectedX(clientX - newOffsetX);
-      setSelectedY(clientY - newOffsetY);
+    ({clientX, clientY}: SyntheticMouseEvent<>): void => {
+      setMouseX(clientX);
+      setMouseY(clientY);
       startDrag();
     },
     [
-      setOffsetX,
-      setOffsetY,
-      setSelectedX,
-      setSelectedY,
+      setMouseX,
+      setMouseY,
       startDrag,
     ],
   );
@@ -91,7 +74,7 @@ const useDrag = (): DragReturn => {
     },
     [dragItem, dropItem, isSelected],
   );
-  return {isSelected, select, selectedX, selectedY};
+  return {isSelected, mouseX, mouseY, select};
 }
 
 export default useDrag;

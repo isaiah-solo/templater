@@ -13,7 +13,7 @@ const PADDING = 20;
 function Workspace(): Element<'div'> {
   const workspaceRef = useRef(null);
   const workspace = workspaceRef.current;
-  const [pointerY, setPointerY] = useState<?number>(null);
+  const [mouseY, setMouseY] = useState<?number>(null);
   const {addItem, items} = useWorkspaceItems();
   const itemElements = useMemo(
     (): Array<Element<typeof WorkspaceItem>> => {
@@ -22,12 +22,12 @@ function Workspace(): Element<'div'> {
       const currentItemsHeight = itemElementsHeight + itemGapsHeight + PADDING;
       const placeholderItem = {type: 'placeholder'};
       let currentItems = [...items];
-      if (pointerY == null) {
+      if (mouseY == null) {
         // nothing different happens
-      } else if (pointerY > currentItemsHeight) {
+      } else if (mouseY > currentItemsHeight) {
         currentItems = [...currentItems, placeholderItem];
       } else {
-        const heightNoPadding = pointerY - PADDING - ITEM_HEIGHT;
+        const heightNoPadding = mouseY - PADDING - ITEM_HEIGHT;
         const placeholderIndex = Math.ceil(
           heightNoPadding > 0 ? heightNoPadding / (GAP + ITEM_HEIGHT) : 0
         );
@@ -52,22 +52,22 @@ function Workspace(): Element<'div'> {
           type={type} />
       ))
     },
-    [addItem, items, pointerY],
+    [addItem, items, mouseY],
   );
   const hover = useCallback(
     (e: SyntheticMouseEvent<>): void => {
       if (workspace == null) {
         return;
       }
-      setPointerY(e.pageY - workspace.offsetTop);
+      setMouseY(e.pageY - workspace.offsetTop);
     },
-    [setPointerY, workspace],
+    [setMouseY, workspace],
   );
   const hoverOut = useCallback(
     (_: SyntheticMouseEvent<>): void => {
-      setPointerY(null);
+      setMouseY(null);
     },
-    [setPointerY],
+    [setMouseY],
   );
   return (
     <div onMouseMove={hover}
