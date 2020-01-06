@@ -7,6 +7,8 @@ export type Item = $ReadOnly<{|
 |}>;
 
 export type State = $ReadOnly<{|
+  draggingNewItem: boolean,
+  hoveredItem: ?Item,
   items: Array<Item>,
 |}>;
 
@@ -31,13 +33,36 @@ type DeleteAction = $ReadOnly<{|
   type: 'delete',
 |}>;
 
+type EndDragAction = $ReadOnly<{|
+  index: number,
+  type: 'end_drag',
+|}>;
+
+type StartDragAction = $ReadOnly<{|
+  hoveredItem: Item,
+  type: 'start_drag',
+|}>;
+
+type StopDragAction = $ReadOnly<{|
+  type: 'stop_drag',
+|}>;
+
 type Action = AddAction
   | AddToBeginningAction
   | AddToEndAction
-  | DeleteAction;
+  | DeleteAction
+  | EndDragAction
+  | StartDragAction
+  | StopDragAction;
+
+const DEFAULT_STATE = {
+  draggingNewItem: false,
+  hoveredItem: null,
+  items: [],
+};
 
 const workspaceItemReducer = (
-  state: State = {items: []},
+  state: State = DEFAULT_STATE,
   action: Action,
 ): ?State => {
   const prevItems = [...state.items];
@@ -50,30 +75,43 @@ const workspaceItemReducer = (
         action.item,
         ...end,
       ];
-      return {items};
+      return {...state, items};
     }
     case 'add_to_beginning': {
       const items = [
         action.item,
         ...prevItems,
       ];
-      return {items};
+      return {...state, items};
     }
     case 'add_to_end': {
       const items = [
         ...prevItems,
         action.item,
       ];
-      return {items};
+      return {...state, items};
     }
-    case 'delete': {
-      const beginning = prevItems.slice(0, action.index);
-      const end = prevItems.slice(action.index + 1, prevItems.length);
+    case 'end_drag': {
+      const hoveredItem = state.hoveredItem;
+      const index = action.index;
+      if (hoveredItem == null) {
+        return {...state, draggingNewItem: false};
+      }
+      const beginning = prevItems.slice(0, index);
+      const end = prevItems.slice(index, prevItems.length);
       const items = [
         ...beginning,
+        hoveredItem,
         ...end,
       ];
-      return {items};
+      return {...state, draggingNewItem: false, hoveredItem: null, items};
+    }
+    case 'start_drag': {
+      const hoveredItem = action.hoveredItem;
+      return {...state, draggingNewItem: true, hoveredItem};
+    }
+    case 'stop_drag': {
+      return {...state, draggingNewItem: false};
     }
     default:
       break;

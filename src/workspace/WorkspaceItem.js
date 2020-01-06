@@ -10,20 +10,22 @@ const BACKGROUND_COLOR_MAP = {
   text: '#ee0060',
 };
 
+export type MouseFunc = (e: SyntheticMouseEvent<>) => void;
+
 type Props = $ReadOnly<{|
   height: number,
-  onClick: () => void,
+  onMouseUp: MouseFunc,
   type: ItemType,
 |}>;
 
 function WorkspaceItem({
   height,
-  onClick,
+  onMouseUp,
   type,
 }: Props): Element<'div'> {
   const backgroundColor = BACKGROUND_COLOR_MAP[type];
   return (
-    <div onClick={onClick}
+    <div onMouseUp={onMouseUp}
       style={{
         ...styles.root,
         backgroundColor,

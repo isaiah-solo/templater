@@ -1,77 +1,51 @@
 // @flow strict
 
 import type {Element} from 'react';
+import type {MouseFunc} from './WorkspaceItem';
 import type {Item} from '../reducer/workspaceItemReducer';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
+import {useDispatch} from "react-redux";
 import WorkspaceItem from './WorkspaceItem.js';
-import useWorkspaceItems from '../reducer/useWorkspaceItems';
-
-const GAP = 12;
-const ITEM_HEIGHT = 40;
-const PADDING = 20;
+import useWorkspaceItems, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceItems';
 
 function Workspace(): Element<'div'> {
+  const dispatch = useDispatch();
   const workspaceRef = useRef(null);
-  const workspace = workspaceRef.current;
-  const [mouseY, setMouseY] = useState<?number>(null);
-  const {addItem, items} = useWorkspaceItems();
+  const {
+    hover,
+    hoverOut,
+    items,
+  } = useWorkspaceItems(workspaceRef);
+  const dropItemAt = useCallback(
+    (index: number): MouseFunc => {
+      return (_: SyntheticMouseEvent<>): void => {
+        console.log('test');
+        dispatch({
+          index,
+          type: 'end_drag',
+        });
+      };
+    },
+    [dispatch],
+  );
   const itemElements = useMemo(
     (): Array<Element<typeof WorkspaceItem>> => {
-      const itemElementsHeight = ITEM_HEIGHT * items.length;
-      const itemGapsHeight = GAP * (items.length - 1);
-      const currentItemsHeight = itemElementsHeight + itemGapsHeight + PADDING;
-      const placeholderItem = {type: 'placeholder'};
-      let currentItems = [...items];
-      if (mouseY == null) {
-        // nothing different happens
-      } else if (mouseY > currentItemsHeight) {
-        currentItems = [...currentItems, placeholderItem];
-      } else {
-        const heightNoPadding = mouseY - PADDING - ITEM_HEIGHT;
-        const placeholderIndex = Math.ceil(
-          heightNoPadding > 0 ? heightNoPadding / (GAP + ITEM_HEIGHT) : 0
-        );
-        const beginningItems = currentItems.slice(0, placeholderIndex);
-        const endingItems = currentItems.slice(
-          placeholderIndex,
-          currentItems.length,
-        );
-        currentItems = [
-          ...beginningItems,
-          placeholderItem,
-          ...endingItems,
-        ];
-      }
-      return currentItems.map((
+      return items.map((
         {type}: Item,
         index: number,
       ): Element<typeof WorkspaceItem> => (
         <WorkspaceItem height={ITEM_HEIGHT}
-          onClick={addItem({type: 'text'}).atIndex(index)}
           key={index}
+          onMouseUp={dropItemAt(index)}
           type={type} />
       ))
     },
-    [addItem, items, mouseY],
-  );
-  const hover = useCallback(
-    (e: SyntheticMouseEvent<>): void => {
-      if (workspace == null) {
-        return;
-      }
-      setMouseY(e.pageY - workspace.offsetTop);
-    },
-    [setMouseY, workspace],
-  );
-  const hoverOut = useCallback(
-    (_: SyntheticMouseEvent<>): void => {
-      setMouseY(null);
-    },
-    [setMouseY],
+    [dropItemAt, items],
   );
   return (
-    <div onMouseMove={hover}
-      onMouseLeave={hoverOut}
+    <div onMouseLeave={hoverOut}
+      onMouseMove={hover}
+      onMouseUp={hoverOut}
       ref={workspaceRef}
       style={styles.root}>
       {itemElements}
