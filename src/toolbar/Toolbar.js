@@ -44,7 +44,11 @@ function Toolbar(): Element<'div'> {
     (e: SyntheticMouseEvent<>): void => {
       select(e);
       dispatch({
-        hoveredItem: {type: 'text'},
+        hoveredItem: {
+          id: 'hover',
+          text: 'Click to add text...',
+          type: 'text',
+        },
         type: 'start_drag',
       });
     },

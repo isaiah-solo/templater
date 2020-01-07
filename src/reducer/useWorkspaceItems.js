@@ -31,7 +31,7 @@ function useWorkplaceItems(ref: ElementRef<any>) {
     const itemElementsHeight = ITEM_HEIGHT * initItems.length;
     const itemGapsHeight = GAP * (initItems.length - 1);
     const itemsHeight = itemElementsHeight + itemGapsHeight + PADDING;
-    const placeholderItem = {type: 'placeholder'};
+    const placeholderItem = {id: 'placeholder', type: 'placeholder'};
     let items = [...initItems];
     if (mouseY == null) {
       // nothing different happens

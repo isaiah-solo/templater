@@ -3,29 +3,16 @@
 export type ItemType = 'new_item' | 'placeholder' | 'text';
 
 export type Item = $ReadOnly<{|
+  id: string,
+  text?: string,
   type: ItemType,
 |}>;
 
 export type State = $ReadOnly<{|
+  currentID: number,
   draggingNewItem: boolean,
   hoveredItem: ?Item,
   items: Array<Item>,
-|}>;
-
-type AddAction = $ReadOnly<{|
-  index: number,
-  item: Item,
-  type: 'add',
-|}>;
-
-type AddToBeginningAction = $ReadOnly<{|
-  item: Item,
-  type: 'add_to_beginning',
-|}>;
-
-type AddToEndAction = $ReadOnly<{|
-  item: Item,
-  type: 'add_to_end',
 |}>;
 
 type DeleteAction = $ReadOnly<{|
@@ -47,15 +34,20 @@ type StopDragAction = $ReadOnly<{|
   type: 'stop_drag',
 |}>;
 
-type Action = AddAction
-  | AddToBeginningAction
-  | AddToEndAction
-  | DeleteAction
+type UpdateItemTextAction = $ReadOnly<{|
+  id: number,
+  text: string,
+  type: 'update_item_text',
+|}>;
+
+type Action = DeleteAction
   | EndDragAction
   | StartDragAction
-  | StopDragAction;
+  | StopDragAction
+  | UpdateItemTextAction;
 
 const DEFAULT_STATE = {
+  currentID: 0,
   draggingNewItem: false,
   hoveredItem: null,
   items: [],
@@ -67,33 +59,10 @@ const workspaceItemReducer = (
 ): ?State => {
   const prevItems = [...state.items];
   switch (action.type) {
-    case 'add': {
-      const beginning = prevItems.slice(0, action.index);
-      const end = prevItems.slice(action.index, prevItems.length);
-      const items = [
-        ...beginning,
-        action.item,
-        ...end,
-      ];
-      return {...state, items};
-    }
-    case 'add_to_beginning': {
-      const items = [
-        action.item,
-        ...prevItems,
-      ];
-      return {...state, items};
-    }
-    case 'add_to_end': {
-      const items = [
-        ...prevItems,
-        action.item,
-      ];
-      return {...state, items};
-    }
     case 'end_drag': {
-      const hoveredItem = state.hoveredItem;
+      const currentID = state.currentID;
       const index = action.index;
+      const hoveredItem = state.hoveredItem != null ? {...state.hoveredItem, id: String(currentID)} : null;
       if (hoveredItem == null) {
         return {...state, draggingNewItem: false};
       }
@@ -104,7 +73,7 @@ const workspaceItemReducer = (
         hoveredItem,
         ...end,
       ];
-      return {...state, draggingNewItem: false, hoveredItem: null, items};
+      return {...state, currentID: currentID + 1, draggingNewItem: false, hoveredItem: null, items};
     }
     case 'start_drag': {
       const hoveredItem = action.hoveredItem;
@@ -112,6 +81,22 @@ const workspaceItemReducer = (
     }
     case 'stop_drag': {
       return {...state, draggingNewItem: false};
+    }
+    case 'update_item_text': {
+      const id = action.id;
+      const findItem = (item: Item): boolean => {
+        return item.id === id;
+      };
+      const originalItem = prevItems.find(findItem);
+      const index = prevItems.findIndex(findItem);
+      const beginning = prevItems.slice(0, index);
+      const end = prevItems.slice(index + 1, prevItems.length);
+      const items = [
+        ...beginning,
+        {...originalItem, text: action.text},
+        ...end,
+      ];
+      return {...state, items};
     }
     default:
       break;

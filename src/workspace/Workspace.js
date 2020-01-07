@@ -1,12 +1,21 @@
 // @flow strict
 
 import type {Element} from 'react';
-import type {MouseFunc} from './WorkspaceItem';
-import type {Item} from '../reducer/workspaceItemReducer';
+import type {MouseFunc} from '../workplace_item/TextItem.js';
+import type {Item, ItemType} from '../reducer/workspaceItemReducer';
 import React, {useCallback, useMemo, useRef} from 'react';
 import {useDispatch} from "react-redux";
-import WorkspaceItem from './WorkspaceItem.js';
+import PlaceholderItem from '../workplace_item/PlaceholderItem.js';
+import TextItem from '../workplace_item/TextItem.js';
 import useWorkspaceItems, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceItems';
+
+type ItemElementType = typeof PlaceholderItem
+  | typeof TextItem;
+
+const ITEM_MAP: {[ItemType]: ItemElementType} = {
+  placeholder: PlaceholderItem,
+  text: TextItem,
+};
 
 function Workspace(): Element<'div'> {
   const dispatch = useDispatch();
@@ -19,7 +28,6 @@ function Workspace(): Element<'div'> {
   const dropItemAt = useCallback(
     (index: number): MouseFunc => {
       return (_: SyntheticMouseEvent<>): void => {
-        console.log('test');
         dispatch({
           index,
           type: 'end_drag',
@@ -29,16 +37,20 @@ function Workspace(): Element<'div'> {
     [dispatch],
   );
   const itemElements = useMemo(
-    (): Array<Element<typeof WorkspaceItem>> => {
+    (): Array<Element<ItemElementType>> => {
       return items.map((
-        {type}: Item,
+        {id, text, type}: Item,
         index: number,
-      ): Element<typeof WorkspaceItem> => (
-        <WorkspaceItem height={ITEM_HEIGHT}
-          key={index}
-          onMouseUp={dropItemAt(index)}
-          type={type} />
-      ))
+      ): Element<ItemElementType> => {
+        const Item = ITEM_MAP[type];
+        return (
+          <Item height={ITEM_HEIGHT}
+            id={id}
+            index={index}
+            key={index}
+            onMouseUp={dropItemAt(index)} />
+        );
+      })
     },
     [dropItemAt, items],
   );
