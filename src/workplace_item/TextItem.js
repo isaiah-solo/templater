@@ -3,7 +3,7 @@
 import type {Item, State} from '../reducer/workspaceItemReducer';
 import type {Element} from 'react';
 
-import React, {useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 
 import useToggle from '../hook/useToggle';
@@ -14,7 +14,7 @@ type Props = $ReadOnly<{|
   height: number,
   id: string,
   index: number,
-  onMouseUp: MouseFunc,
+  onMouseUp?: MouseFunc,
 |}>;
 
 function TextItem({
@@ -52,6 +52,20 @@ function TextItem({
     },
     [dispatch, id],
   );
+  const onEnter = useCallback(
+    (e: SyntheticKeyboardEvent<>): void => {
+      if (e.key === 'Enter') {
+        disableEditMode();
+      }
+    },
+    [disableEditMode],
+  );
+  const displayText = useMemo(
+    (): string => {
+      return text.length > 0 ? text : 'Click to add text...';
+    },
+    [text],
+  );
   return (
     <div onClick={enableEditMode}
       onBlur={disableEditMode}
@@ -64,10 +78,11 @@ function TextItem({
         ? <input autoFocus
             onBlur={disableEditMode}
             onChange={changeText}
+            onKeyDown={onEnter}
             style={styles.input}
             type="text"
             value={text} />
-        : text}
+        : displayText}
     </div>
   );
 }

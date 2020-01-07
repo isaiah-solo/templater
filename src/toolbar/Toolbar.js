@@ -46,7 +46,7 @@ function Toolbar(): Element<'div'> {
       dispatch({
         hoveredItem: {
           id: 'hover',
-          text: 'Click to add text...',
+          text: '',
           type: 'text',
         },
         type: 'start_drag',

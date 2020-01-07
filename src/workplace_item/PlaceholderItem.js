@@ -9,7 +9,7 @@ type Props = $ReadOnly<{|
   height: number,
   id: string,
   index: number,
-  onMouseUp: MouseFunc,
+  onMouseUp?: MouseFunc,
 |}>;
 
 function PlaceholderItem({
