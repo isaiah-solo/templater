@@ -5,7 +5,7 @@ import type {Element} from 'react';
 import type {Item, State} from '../reducer/workspaceItemReducer';
 
 import React, {useCallback, useMemo} from 'react';
-import {FaTimes} from 'react-icons/fa';
+import {FaGripVertical, FaTimes} from 'react-icons/fa';
 import {useDispatch, useSelector} from "react-redux";
 
 import useToggle from '../hook/useToggle';
@@ -92,15 +92,18 @@ function TextItem({
         ...styles.root,
         height,
       }}>
-      {inEditMode
-        ? <input autoFocus
-            onBlur={disableEditMode}
-            onChange={changeText}
-            onKeyDown={onEnter}
-            style={styles.input}
-            type="text"
-            value={text} />
-        : displayText}
+      <div style={styles.leftItems}>
+        <FaGripVertical style={styles.gripIcon} />
+        {inEditMode
+          ? <input autoFocus
+              onBlur={disableEditMode}
+              onChange={changeText}
+              onKeyDown={onEnter}
+              style={styles.input}
+              type="text"
+              value={text} />
+          : displayText}
+      </div>
       {showingDelete && (
         <div onClick={deleteItem}
           style={styles.deleteIcon}>
@@ -119,8 +122,17 @@ const styles = {
     color: 'white',
     display: 'flex',
     justifyContent: 'space-between',
-    padding: '0 10px 0 20px',
+    padding: '0 10px',
     width: '100%',
+  },
+  gripIcon: {
+    cursor: 'pointer',
+    marginRight: 10,
+  },
+  leftItems: {
+    alignItems: 'center',
+    boxSizing: 'border-box',
+    display: 'flex',
   },
   deleteIcon: {
     boxSizing: 'border-box',

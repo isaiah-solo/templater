@@ -48,7 +48,11 @@ function Workspace(): Element<'div'> {
             id={id}
             index={index}
             key={index}
-            onMouseUp={type === 'placeholder' ? dropItemAt(index) : undefined} />
+            onMouseUp={
+              type === 'placeholder'
+                ? dropItemAt(index)
+                : undefined
+            } />
         );
       })
     },

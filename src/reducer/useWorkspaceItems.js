@@ -33,8 +33,9 @@ function useWorkplaceItems(ref: ElementRef<any>): ItemsReturn {
     const placeholderItem = {id: 'placeholder', type: 'placeholder'};
     let items = [...initItems];
     if (mouseY == null) {
-      // nothing different happens
-    } else if (mouseY > itemsHeight) {
+      return items;
+    }
+    if (mouseY > itemsHeight) {
       items = [...items, placeholderItem];
     } else {
       const heightNoPadding = mouseY - PADDING - ITEM_HEIGHT;
