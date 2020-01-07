@@ -70,7 +70,7 @@ function Workspace(): Element<typeof React.Fragment> {
         );
       })
     },
-    [dropItemAt, selectItemFor, items],
+    [dropItemAt, items, selectItemFor],
   );
   const hoveringItem = useMemo(
     (): Element<'div'> => (
