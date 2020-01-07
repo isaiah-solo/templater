@@ -74,7 +74,7 @@ function TextItem({
         type: 'delete_item',
       });
     },
-    [id],
+    [dispatch, id],
   );
   const displayText = useMemo(
     (): string => {
