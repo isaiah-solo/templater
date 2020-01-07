@@ -1,9 +1,7 @@
 // @flow strict
 
-import type {State} from '../reducer/workspaceItemReducer';
-
 import {useCallback, useEffect, useMemo} from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 
 import useDrag from '../hook/useDrag';
 
@@ -22,11 +20,6 @@ const COPY_HEIGHT = 20;
 
 const useWorkspace = (): DragReturn => {
   const dispatch = useDispatch();
-  const draggingGlobal = useSelector((state?: State): boolean => {
-    return state !== undefined
-      ? state.draggingNewItem
-      : false;
-  });
   const {
     dragging,
     mouseX,
@@ -66,12 +59,12 @@ const useWorkspace = (): DragReturn => {
   );
   useEffect(
     (): void => {
-      if (!draggingGlobal) {
+      if (!dragging) {
         return;
       }
       window.addEventListener('mouseup', dropItem, true);
     },
-    [draggingGlobal, dropItem],
+    [dragging, dropItem],
   );
   return {dragging, positionStyle, selectItemFor};
 }

@@ -1,26 +1,26 @@
 // @flow strict
 
-import type {Item, State} from '../reducer/workspaceItemReducer';
+import type {Item} from '../reducer/workspaceItemReducer';
 
-import {useCallback, useEffect} from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import {useCallback, useEffect, useMemo} from 'react';
+import {useDispatch} from "react-redux";
 
 import useDrag from '../hook/useDrag';
 
+type PositionStyle = $ReadOnly<{|
+  left: number,
+  top: number,
+|}>;
 type DragReturn = $ReadOnly<{|
   dragging: boolean,
-  mouseX: ?number,
-  mouseY: ?number,
+  positionStyle: ?PositionStyle,
   select: (e: SyntheticMouseEvent<>) => void,
 |}>;
 
+const COPY_HEIGHT = 20;
+
 const useToolbarItem = (item: Item): DragReturn => {
   const dispatch = useDispatch();
-  const draggingGlobal = useSelector((state?: State): boolean => {
-    return state !== undefined
-      ? state.draggingNewItem
-      : false;
-  });
   const {
     dragging,
     mouseX,
@@ -46,16 +46,26 @@ const useToolbarItem = (item: Item): DragReturn => {
     },
     [dispatch, item, select],
   );
+  const positionStyle = useMemo(
+    (): ?PositionStyle => {
+      return mouseX != null && mouseY != null
+        ? ({
+          left: mouseX,
+          top: mouseY - COPY_HEIGHT - 10,
+        }) : null;
+    },
+    [mouseX, mouseY],
+  );
   useEffect(
     (): void => {
-      if (!draggingGlobal) {
+      if (!dragging) {
         return;
       }
       window.addEventListener('mouseup', dropItem, true);
     },
-    [draggingGlobal, dropItem],
+    [dragging, dropItem],
   );
-  return {dragging, mouseX, mouseY, select: selectItem};
+  return {dragging, positionStyle, select: selectItem};
 }
 
 export default useToolbarItem;

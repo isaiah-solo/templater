@@ -11,8 +11,7 @@ const COPY_HEIGHT = 20;
 function TextItem(): Element<typeof React.Fragment> {
   const {
     dragging,
-    mouseX,
-    mouseY,
+    positionStyle,
     select,
   } = useToolbarItem({
     id: 'hover',
@@ -24,15 +23,10 @@ function TextItem(): Element<typeof React.Fragment> {
       <div style={{
         ...styles.root,
         ...styles.copy,
-        left: mouseX,
-        top: (
-          mouseY != null
-            ? mouseY - COPY_HEIGHT - 10
-            : null
-        ),
+        ...positionStyle,
       }} />
     ),
-    [mouseX, mouseY],
+    [positionStyle],
   );
   return (
     <>

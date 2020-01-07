@@ -27,16 +27,10 @@ function useWorkspaceReducer(ref: ElementRef<any>): ItemsReturn {
   });
   const items = useSelector((state?: State): Array<Item> => {
     const initItems = state !== undefined ? state.items : [];
-    const itemElementsHeight = ITEM_HEIGHT * initItems.length;
-    const itemGapsHeight = GAP * (initItems.length - 1);
-    const itemsHeight = itemElementsHeight + itemGapsHeight + PADDING;
     const placeholderItem = {id: 'placeholder', type: 'placeholder'};
     let items = [...initItems];
     if (mouseY == null) {
       return [...initItems];
-    }
-    if (mouseY > itemsHeight) {
-      return [...initItems, placeholderItem];
     }
     const heightNoPadding = mouseY - PADDING - ITEM_HEIGHT;
     const placeholderIndex = Math.ceil(
