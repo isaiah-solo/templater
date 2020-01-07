@@ -1,9 +1,11 @@
 // @flow strict
 
-import type {Item, State} from '../reducer/workspaceItemReducer';
 import type {Element} from 'react';
 
+import type {Item, State} from '../reducer/workspaceItemReducer';
+
 import React, {useCallback, useMemo} from 'react';
+import {FaTimes} from 'react-icons/fa';
 import {useDispatch, useSelector} from "react-redux";
 
 import useToggle from '../hook/useToggle';
@@ -42,6 +44,11 @@ function TextItem({
     toggleFalse: disableEditMode,
     toggleTrue: enableEditMode,
   } = useToggle(false);
+  const {
+    isToggled: showingDelete,
+    toggleFalse: hideDelete,
+    toggleTrue: showDelete,
+  } = useToggle(false);
   const changeText = useCallback(
     (e: SyntheticInputEvent<>): void => {
       dispatch({
@@ -60,6 +67,15 @@ function TextItem({
     },
     [disableEditMode],
   );
+  const deleteItem = useCallback(
+    (e: SyntheticMouseEvent<>): void => {
+      dispatch({
+        id,
+        type: 'delete_item',
+      });
+    },
+    [id],
+  );
   const displayText = useMemo(
     (): string => {
       return text.length > 0 ? text : 'Click to add text...';
@@ -69,6 +85,8 @@ function TextItem({
   return (
     <div onClick={enableEditMode}
       onBlur={disableEditMode}
+      onMouseEnter={showDelete}
+      onMouseLeave={hideDelete}
       onMouseUp={onMouseUp}
       style={{
         ...styles.root,
@@ -83,6 +101,12 @@ function TextItem({
             type="text"
             value={text} />
         : displayText}
+      {showingDelete && (
+        <div onClick={deleteItem}
+          style={styles.deleteIcon}>
+          <FaTimes />
+        </div>
+      )}
     </div>
   );
 }
@@ -94,8 +118,15 @@ const styles = {
     boxSizing: 'border-box',
     color: 'white',
     display: 'flex',
-    paddingLeft: 20,
+    justifyContent: 'space-between',
+    padding: '0 10px 0 20px',
     width: '100%',
+  },
+  deleteIcon: {
+    boxSizing: 'border-box',
+    cursor: 'pointer',
+    height: 16,
+    width: 16,
   },
   input: {
     backgroundColor: '#ee0060',

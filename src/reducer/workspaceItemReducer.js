@@ -1,6 +1,7 @@
 // @flow strict
 
-export type ItemType = 'new_item' | 'placeholder' | 'text';
+export type ItemType = 'placeholder'
+  | 'text';
 
 export type Item = $ReadOnly<{|
   id: string,
@@ -15,9 +16,9 @@ export type State = $ReadOnly<{|
   items: Array<Item>,
 |}>;
 
-type DeleteAction = $ReadOnly<{|
-  index: number,
-  type: 'delete',
+type DeleteItemAction = $ReadOnly<{|
+  id: string,
+  type: 'delete_item',
 |}>;
 
 type EndDragAction = $ReadOnly<{|
@@ -40,7 +41,7 @@ type UpdateItemTextAction = $ReadOnly<{|
   type: 'update_item_text',
 |}>;
 
-type Action = DeleteAction
+type Action = DeleteItemAction
   | EndDragAction
   | StartDragAction
   | StopDragAction
@@ -59,10 +60,30 @@ const workspaceItemReducer = (
 ): ?State => {
   const prevItems = [...state.items];
   switch (action.type) {
+    case 'delete_item': {
+      const id = action.id;
+      const findItem = (item: Item): boolean => {
+        return item.id === id;
+      };
+      const index = prevItems.findIndex(findItem);
+      const beginning = prevItems.slice(0, index);
+      const end = prevItems.slice(index + 1, prevItems.length);
+      const items = [
+        ...beginning,
+        ...end,
+      ];
+      return {
+        ...state,
+        draggingNewItem: false,
+        items,
+      };
+    }
     case 'end_drag': {
       const currentID = state.currentID;
       const index = action.index;
-      const hoveredItem = state.hoveredItem != null ? {...state.hoveredItem, id: String(currentID)} : null;
+      const hoveredItem = state.hoveredItem != null
+        ? {...state.hoveredItem, id: String(currentID)}
+        : null;
       if (hoveredItem == null) {
         return {...state, draggingNewItem: false};
       }
@@ -73,7 +94,13 @@ const workspaceItemReducer = (
         hoveredItem,
         ...end,
       ];
-      return {...state, currentID: currentID + 1, draggingNewItem: false, hoveredItem: null, items};
+      return {
+        ...state,
+        currentID: currentID + 1,
+        draggingNewItem: false,
+        hoveredItem: null,
+        items
+      };
     }
     case 'start_drag': {
       const hoveredItem = action.hoveredItem;
