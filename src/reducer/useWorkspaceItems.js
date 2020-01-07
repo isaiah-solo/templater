@@ -1,23 +1,23 @@
 // @flow strict
 
-import type {Item, State} from './workspaceItemReducer';
 import type {ElementRef} from 'react';
+
+import type {Item, State} from './workspaceItemReducer';
+
 import {useCallback, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-
-type AddItemFunc = () => void;
-
-type AddItemCurryFunc = $ReadOnly<{|
-  atIndex: (index: number) => AddItemFunc,
-  toBeginning: () => AddItemFunc,
-  toEnd: () => AddItemFunc,
-|}>;
 
 export const GAP = 12;
 export const ITEM_HEIGHT = 40;
 export const PADDING = 20;
 
-function useWorkplaceItems(ref: ElementRef<any>) {
+type ItemsReturn = $ReadOnly<{|
+  hover: (e: SyntheticMouseEvent<>) => void,
+  hoverOut: (e: SyntheticMouseEvent<>) => void,
+  items: Array<Item>,
+|}>;
+
+function useWorkplaceItems(ref: ElementRef<any>): ItemsReturn {
   const current = ref.current;
   const dispatch = useDispatch();
   const [mouseY, setMouseY] = useState<?number>(null);
@@ -70,38 +70,7 @@ function useWorkplaceItems(ref: ElementRef<any>) {
     },
     [setMouseY],
   );
-  const addItem = useCallback(
-    (item: Item): AddItemCurryFunc => ({
-      atIndex: (index: number): AddItemFunc => (
-        (): void => {
-          console.log('test');
-          dispatch({
-            index,
-            item,
-            type: 'add',
-          });
-        }
-      ),
-      toBeginning: (): AddItemFunc => (
-        (): void => {
-          dispatch({
-            item,
-            type: 'add_to_beginning',
-          });
-        }
-      ),
-      toEnd: (): AddItemFunc => (
-        (): void => {
-          dispatch({
-            item,
-            type: 'add_to_end',
-          });
-        }
-      ),
-    }),
-    [dispatch],
-  );
-  return {addItem, hover, hoverOut, items};
+  return {hover, hoverOut, items};
 }
 
 export default useWorkplaceItems;
