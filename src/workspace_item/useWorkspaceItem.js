@@ -17,12 +17,13 @@ type DragReturn = $ReadOnly<{|
 
 const useWorkspaceItem = (): DragReturn => {
   const dispatch = useDispatch();
-  const dragging = useSelector((state?: State): boolean => {
+  const draggingGlobal = useSelector((state?: State): boolean => {
     return state !== undefined
       ? state.draggingNewItem
       : false;
   });
   const {
+    dragging,
     mouseX,
     mouseY,
     select,
@@ -50,12 +51,12 @@ const useWorkspaceItem = (): DragReturn => {
   );
   useEffect(
     (): void => {
-      if (!dragging) {
+      if (!draggingGlobal) {
         return;
       }
       window.addEventListener('mouseup', dropItem, true);
     },
-    [dragging, dropItem],
+    [draggingGlobal, dropItem],
   );
   return {dragging, mouseX, mouseY, selectItemFor};
 }

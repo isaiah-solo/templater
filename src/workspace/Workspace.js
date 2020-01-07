@@ -3,14 +3,13 @@
 import type {Element} from 'react';
 import type {Item, ItemType} from '../reducer/workspaceItemReducer';
 
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
 import {useDispatch} from "react-redux";
 
 import PlaceholderItem from '../workspace_item/PlaceholderItem.js';
 import TextItem from '../workspace_item/TextItem.js';
 import useWorkspaceItems, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceItems';
 import useWorkspaceItem from '../workspace_item/useWorkspaceItem';
-import useToggle from '../hook/useToggle';
 
 type ItemElementType = typeof PlaceholderItem
   | typeof TextItem;
@@ -26,11 +25,6 @@ function Workspace(): Element<typeof React.Fragment> {
   const dispatch = useDispatch();
   const workspaceRef = useRef(null);
   const {
-    isToggled: draggingFromHere,
-    toggleFalse: dropFromHere,
-    toggleTrue: dragFromHere,
-  } = useToggle(false);
-  const {
     dragging,
     mouseX,
     mouseY,
@@ -41,33 +35,16 @@ function Workspace(): Element<typeof React.Fragment> {
     hoverOut,
     items,
   } = useWorkspaceItems(workspaceRef);
-  const dropItemFromHere = useCallback(
-    (): void => {
-      dropFromHere();
-      window.removeEventListener('mouseup', dropItemFromHere, true);
-    },
-    [dropFromHere],
-  );
   const dropItemAt = useCallback(
     (index: number): MouseFunc => {
       return (_: SyntheticMouseEvent<>): void => {
-        dropFromHere();
         dispatch({
           index,
           type: 'end_drag',
         });
       };
     },
-    [dispatch, dropFromHere],
-  );
-  const gripItemFor = useCallback(
-    (id: string): MouseFunc => {
-      return (e: SyntheticMouseEvent<>): void => {
-        dragFromHere();
-        selectItemFor(id)(e);
-      };
-    },
-    [dragFromHere, selectItemFor],
+    [dispatch],
   );
   const itemElements = useMemo(
     (): Array<Element<ItemElementType>> => {
@@ -79,7 +56,7 @@ function Workspace(): Element<typeof React.Fragment> {
         return (
           <Item grip={
               type !== 'placeholder'
-                ? gripItemFor(id)
+                ? selectItemFor(id)
                 : undefined
             }
             height={ITEM_HEIGHT}
@@ -93,7 +70,7 @@ function Workspace(): Element<typeof React.Fragment> {
         );
       })
     },
-    [dropItemAt, gripItemFor, items],
+    [dropItemAt, selectItemFor, items],
   );
   const hoveringItem = useMemo(
     (): Element<'div'> => (
@@ -110,18 +87,9 @@ function Workspace(): Element<typeof React.Fragment> {
     ),
     [mouseX, mouseY],
   );
-  useEffect(
-    (): void => {
-      if (!draggingFromHere) {
-        return;
-      }
-      window.addEventListener('mouseup', dropItemFromHere, true);
-    },
-    [draggingFromHere, dropItemFromHere],
-  );
   return (
     <>
-      {draggingFromHere && dragging && hoveringItem}
+      {dragging && hoveringItem}
       <div onMouseLeave={hoverOut}
         onMouseMove={hover}
         onMouseUp={hoverOut}
