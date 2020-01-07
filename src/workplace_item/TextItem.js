@@ -106,7 +106,9 @@ function TextItem({
             type="text"
             value={text} />
         ) : (
-          displayText
+          <span style={styles.displayText}>
+            {displayText}
+          </span>
         )}
       </div>
       {showingDelete && (
@@ -135,6 +137,9 @@ const styles = {
     cursor: 'pointer',
     height: 16,
     width: 16,
+  },
+  displayText: {
+    userSelect: 'none',
   },
   gripIcon: {
     cursor: 'pointer',
