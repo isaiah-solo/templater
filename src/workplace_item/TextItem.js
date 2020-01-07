@@ -61,9 +61,9 @@ function TextItem({
     },
     [dispatch, id],
   );
-  const onEnter = useCallback(
+  const enteredOrEscaped = useCallback(
     (e: SyntheticKeyboardEvent<>): void => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' || e.key === 'Escape') {
         disableEditMode();
       }
     },
@@ -101,7 +101,7 @@ function TextItem({
           <input autoFocus
             onBlur={disableEditMode}
             onChange={changeText}
-            onKeyDown={onEnter}
+            onKeyDown={enteredOrEscaped}
             style={styles.input}
             type="text"
             value={text} />
