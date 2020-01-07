@@ -26,6 +26,11 @@ type EndDragAction = $ReadOnly<{|
   type: 'end_drag',
 |}>;
 
+type PickUpItemAction = $ReadOnly<{|
+  id: string,
+  type: 'pick_up_item',
+|}>;
+
 type StartDragAction = $ReadOnly<{|
   hoveredItem: Item,
   type: 'start_drag',
@@ -43,6 +48,7 @@ type UpdateItemTextAction = $ReadOnly<{|
 
 type Action = DeleteItemAction
   | EndDragAction
+  | PickUpItemAction
   | StartDragAction
   | StopDragAction
   | UpdateItemTextAction;
@@ -59,13 +65,15 @@ const workspaceItemReducer = (
   action: Action,
 ): ?State => {
   const prevItems = [...state.items];
+  const findItemFor = (id: string): (Item => boolean) => {
+    return (item: Item): boolean => {
+      return item.id === id;
+    }
+  };
   switch (action.type) {
     case 'delete_item': {
       const id = action.id;
-      const findItem = (item: Item): boolean => {
-        return item.id === id;
-      };
-      const index = prevItems.findIndex(findItem);
+      const index = prevItems.findIndex(findItemFor(id));
       const beginning = prevItems.slice(0, index);
       const end = prevItems.slice(index + 1, prevItems.length);
       const items = [
@@ -102,6 +110,23 @@ const workspaceItemReducer = (
         items
       };
     }
+    case 'pick_up_item': {
+      const id = action.id;
+      const originalItem = prevItems.find(findItemFor(id));
+      const index = prevItems.findIndex(findItemFor(id));
+      const beginning = prevItems.slice(0, index);
+      const end = prevItems.slice(index + 1, prevItems.length);
+      const items = [
+        ...beginning,
+        ...end,
+      ];
+      return {
+        ...state,
+        draggingNewItem: true,
+        hoveredItem: originalItem,
+        items,
+      };
+    }
     case 'start_drag': {
       const hoveredItem = action.hoveredItem;
       return {...state, draggingNewItem: true, hoveredItem};
@@ -111,11 +136,8 @@ const workspaceItemReducer = (
     }
     case 'update_item_text': {
       const id = action.id;
-      const findItem = (item: Item): boolean => {
-        return item.id === id;
-      };
-      const originalItem = prevItems.find(findItem);
-      const index = prevItems.findIndex(findItem);
+      const originalItem = prevItems.find(findItemFor(String(id)));
+      const index = prevItems.findIndex(findItemFor(String(id)));
       const beginning = prevItems.slice(0, index);
       const end = prevItems.slice(index + 1, prevItems.length);
       const items = [

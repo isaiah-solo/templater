@@ -13,6 +13,7 @@ import useToggle from '../hook/useToggle';
 export type MouseFunc = (e: SyntheticMouseEvent<>) => void;
 
 type Props = $ReadOnly<{|
+  grip?: MouseFunc,
   height: number,
   id: string,
   index: number,
@@ -20,6 +21,7 @@ type Props = $ReadOnly<{|
 |}>;
 
 function TextItem({
+  grip,
   height,
   id,
   onMouseUp,
@@ -83,8 +85,8 @@ function TextItem({
     [text],
   );
   return (
-    <div onClick={enableEditMode}
-      onBlur={disableEditMode}
+    <div onBlur={disableEditMode}
+      onClick={enableEditMode}
       onMouseEnter={showDelete}
       onMouseLeave={hideDelete}
       onMouseUp={onMouseUp}
@@ -93,16 +95,19 @@ function TextItem({
         height,
       }}>
       <div style={styles.leftItems}>
-        <FaGripVertical style={styles.gripIcon} />
-        {inEditMode
-          ? <input autoFocus
-              onBlur={disableEditMode}
-              onChange={changeText}
-              onKeyDown={onEnter}
-              style={styles.input}
-              type="text"
-              value={text} />
-          : displayText}
+        <FaGripVertical onMouseDown={grip}
+          style={styles.gripIcon} />
+        {inEditMode ? (
+          <input autoFocus
+            onBlur={disableEditMode}
+            onChange={changeText}
+            onKeyDown={onEnter}
+            style={styles.input}
+            type="text"
+            value={text} />
+        ) : (
+          displayText
+        )}
       </div>
       {showingDelete && (
         <div onClick={deleteItem}
@@ -125,6 +130,12 @@ const styles = {
     padding: '0 10px',
     width: '100%',
   },
+  deleteIcon: {
+    boxSizing: 'border-box',
+    cursor: 'pointer',
+    height: 16,
+    width: 16,
+  },
   gripIcon: {
     cursor: 'pointer',
     marginRight: 10,
@@ -133,12 +144,6 @@ const styles = {
     alignItems: 'center',
     boxSizing: 'border-box',
     display: 'flex',
-  },
-  deleteIcon: {
-    boxSizing: 'border-box',
-    cursor: 'pointer',
-    height: 16,
-    width: 16,
   },
   input: {
     backgroundColor: '#ee0060',

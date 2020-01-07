@@ -33,27 +33,25 @@ function useWorkplaceItems(ref: ElementRef<any>): ItemsReturn {
     const placeholderItem = {id: 'placeholder', type: 'placeholder'};
     let items = [...initItems];
     if (mouseY == null) {
-      return items;
+      return [...initItems];
     }
     if (mouseY > itemsHeight) {
-      items = [...items, placeholderItem];
-    } else {
-      const heightNoPadding = mouseY - PADDING - ITEM_HEIGHT;
-      const placeholderIndex = Math.ceil(
-        heightNoPadding > 0 ? heightNoPadding / (GAP + ITEM_HEIGHT) : 0
-      );
-      const beginningItems = items.slice(0, placeholderIndex);
-      const endingItems = items.slice(
-        placeholderIndex,
-        items.length,
-      );
-      items = [
-        ...beginningItems,
-        placeholderItem,
-        ...endingItems,
-      ];
+      return [...initItems, placeholderItem];
     }
-    return items;
+    const heightNoPadding = mouseY - PADDING - ITEM_HEIGHT;
+    const placeholderIndex = Math.ceil(
+      heightNoPadding > 0 ? heightNoPadding / (GAP + ITEM_HEIGHT) : 0
+    );
+    const beginningItems = items.slice(0, placeholderIndex);
+    const endingItems = items.slice(
+      placeholderIndex,
+      items.length,
+    );
+    return [
+      ...beginningItems,
+      placeholderItem,
+      ...endingItems,
+    ];
   });
   const hover = useCallback(
     (e: SyntheticMouseEvent<>): void => {

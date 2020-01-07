@@ -6,6 +6,7 @@ import React from 'react';
 export type MouseFunc = (e: SyntheticMouseEvent<>) => void;
 
 type Props = $ReadOnly<{|
+  grip?: MouseFunc,
   height: number,
   id: string,
   index: number,

@@ -1,20 +1,21 @@
 // @flow strict
 
-import type {Item, State} from '../reducer/workspaceItemReducer';
+import type {State} from '../reducer/workspaceItemReducer';
 
 import {useCallback, useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 
 import useDrag from '../hook/useDrag';
 
+type MouseFunc = (e: SyntheticMouseEvent<>) => void;
 type DragReturn = $ReadOnly<{|
   dragging: boolean,
   mouseX: ?number,
   mouseY: ?number,
-  selectItem: (e: SyntheticMouseEvent<>) => void,
+  selectItemFor: (id: string) => MouseFunc,
 |}>;
 
-const useToolbarItem = (item: Item, dropCallback: any): DragReturn => {
+const useWorkspaceItem = (): DragReturn => {
   const dispatch = useDispatch();
   const dragging = useSelector((state?: State): boolean => {
     return state !== undefined
@@ -31,20 +32,21 @@ const useToolbarItem = (item: Item, dropCallback: any): DragReturn => {
       dispatch({
         type: 'stop_drag',
       });
-      dropCallback();
       window.removeEventListener('mouseup', dropItem, true);
     },
-    [dispatch, dropCallback],
+    [dispatch],
   );
-  const selectItem = useCallback(
-    (e: SyntheticMouseEvent<>): void => {
-      select(e);
-      dispatch({
-        hoveredItem: item,
-        type: 'start_drag',
-      });
+  const selectItemFor = useCallback(
+    (id: string): MouseFunc => {
+      return (e: SyntheticMouseEvent<>): void => {
+        select(e);
+        dispatch({
+          id,
+          type: 'pick_up_item',
+        });
+      };
     },
-    [dispatch, item, select],
+    [dispatch, select],
   );
   useEffect(
     (): void => {
@@ -55,7 +57,7 @@ const useToolbarItem = (item: Item, dropCallback: any): DragReturn => {
     },
     [dragging, dropItem],
   );
-  return {dragging, mouseX, mouseY, selectItem};
+  return {dragging, mouseX, mouseY, selectItemFor};
 }
 
-export default useToolbarItem;
+export default useWorkspaceItem;

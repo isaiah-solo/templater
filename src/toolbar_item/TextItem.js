@@ -2,23 +2,39 @@
 
 import type {Element} from 'react';
 
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 
 import useToolbarItem from './useToolbarItem';
+import useToggle from '../hook/useToggle';
 
 const COPY_HEIGHT = 20;
 
 function TextItem(): Element<typeof React.Fragment> {
   const {
+    isToggled: draggingThisItem,
+    toggleFalse: dropThisItem,
+    toggleTrue: dragThisItem,
+  } = useToggle(false);
+  const {
     dragging,
     mouseX,
     mouseY,
     selectItem,
-  } = useToolbarItem({
-    id: 'hover',
-    text: '',
-    type: 'text',
-  });
+  } = useToolbarItem(
+    {
+      id: 'hover',
+      text: '',
+      type: 'text',
+    },
+    dropThisItem,
+  );
+  const selectThisItem = useCallback(
+    (e: SyntheticMouseEvent<>): void => {
+      dragThisItem();
+      selectItem(e);
+    },
+    [dragThisItem, selectItem],
+  );
   const hoveringItem = useMemo(
     (): Element<'div'> => (
       <div style={{
@@ -36,8 +52,8 @@ function TextItem(): Element<typeof React.Fragment> {
   );
   return (
     <>
-      {dragging && hoveringItem}
-      <div onMouseDown={selectItem} style={styles.root}>
+      {dragging && draggingThisItem && hoveringItem}
+      <div onMouseDown={selectThisItem} style={styles.root}>
         Text
       </div>
     </>

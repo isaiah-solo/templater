@@ -8,18 +8,32 @@ import {useDispatch} from "react-redux";
 import PlaceholderItem from '../workplace_item/PlaceholderItem.js';
 import TextItem from '../workplace_item/TextItem.js';
 import useWorkspaceItems, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceItems';
+import useWorkspaceItem from '../workplace_item/useWorkspaceItem';
+import useToggle from '../hook/useToggle';
 
 type ItemElementType = typeof PlaceholderItem
   | typeof TextItem;
 
+const COPY_HEIGHT = 20;
 const ITEM_MAP: {[ItemType]: ItemElementType} = {
   placeholder: PlaceholderItem,
   text: TextItem,
 };
 
-function Workspace(): Element<'div'> {
+function Workspace(): Element<typeof React.Fragment> {
   const dispatch = useDispatch();
   const workspaceRef = useRef(null);
+  const {
+    isToggled: draggingFromHere,
+    toggleFalse: dropFromHere,
+    toggleTrue: dragFromHere,
+  } = useToggle(false);
+  const {
+    dragging,
+    mouseX,
+    mouseY,
+    selectItemFor,
+  } = useWorkspaceItem();
   const {
     hover,
     hoverOut,
@@ -28,13 +42,23 @@ function Workspace(): Element<'div'> {
   const dropItemAt = useCallback(
     (index: number): MouseFunc => {
       return (_: SyntheticMouseEvent<>): void => {
+        dropFromHere();
         dispatch({
           index,
           type: 'end_drag',
         });
       };
     },
-    [dispatch],
+    [dispatch, dropFromHere],
+  );
+  const gripItemFor = useCallback(
+    (id: string): MouseFunc => {
+      return (e: SyntheticMouseEvent<>): void => {
+        dragFromHere();
+        selectItemFor(id)(e);
+      };
+    },
+    [dragFromHere, selectItemFor],
   );
   const itemElements = useMemo(
     (): Array<Element<ItemElementType>> => {
@@ -44,7 +68,12 @@ function Workspace(): Element<'div'> {
       ): Element<ItemElementType> => {
         const Item = ITEM_MAP[type];
         return (
-          <Item height={ITEM_HEIGHT}
+          <Item grip={
+              type !== 'placeholder'
+                ? gripItemFor(id)
+                : undefined
+            }
+            height={ITEM_HEIGHT}
             id={id}
             index={index}
             key={index}
@@ -56,16 +85,34 @@ function Workspace(): Element<'div'> {
         );
       })
     },
-    [dropItemAt, items],
+    [dropItemAt, gripItemFor, items],
+  );
+  const hoveringItem = useMemo(
+    (): Element<'div'> => (
+      <div style={{
+        ...styles.item,
+        ...styles.copy,
+        left: mouseX,
+        top: (
+          mouseY != null
+            ? mouseY - COPY_HEIGHT - 10
+            : null
+        ),
+      }} />
+    ),
+    [mouseX, mouseY],
   );
   return (
-    <div onMouseLeave={hoverOut}
-      onMouseMove={hover}
-      onMouseUp={hoverOut}
-      ref={workspaceRef}
-      style={styles.root}>
-      {itemElements}
-    </div>
+    <>
+      {draggingFromHere && dragging && hoveringItem}
+      <div onMouseLeave={hoverOut}
+        onMouseMove={hover}
+        onMouseUp={hoverOut}
+        ref={workspaceRef}
+        style={styles.root}>
+        {itemElements}
+      </div>
+    </>
   );
 }
 
@@ -83,6 +130,26 @@ const styles = {
     overflowY: 'auto',
     padding: PADDING,
     width: '100%',
+  },
+  item: {
+    alignItems: 'center',
+    backgroundColor: '#ee0060',
+    boxSizing: 'border-box',
+    color: 'white',
+    display: 'flex',
+    fontSize: 24,
+    height: 50,
+    justifyContent: 'center',
+    textAlign: 'center',
+    userSelect: 'none',
+    width: 200,
+  },
+  copy: {
+    borderRadius: 12,
+    boxShadow: '#2a2a2a 0 2px 16px -2px',
+    height: COPY_HEIGHT,
+    position: 'fixed',
+    width: 50,
   },
 };
 
