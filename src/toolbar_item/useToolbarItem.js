@@ -6,22 +6,24 @@ import {useCallback, useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 
 import useDrag from '../hook/useDrag';
+import useToggle from '../hook/useToggle';
 
 type DragReturn = $ReadOnly<{|
   dragging: boolean,
   mouseX: ?number,
   mouseY: ?number,
-  selectItem: (e: SyntheticMouseEvent<>) => void,
+  select: (e: SyntheticMouseEvent<>) => void,
 |}>;
 
-const useToolbarItem = (item: Item, dropCallback: any): DragReturn => {
+const useToolbarItem = (item: Item): DragReturn => {
   const dispatch = useDispatch();
-  const dragging = useSelector((state?: State): boolean => {
+  const draggingGlobal = useSelector((state?: State): boolean => {
     return state !== undefined
       ? state.draggingNewItem
       : false;
   });
   const {
+    dragging,
     mouseX,
     mouseY,
     select,
@@ -31,10 +33,9 @@ const useToolbarItem = (item: Item, dropCallback: any): DragReturn => {
       dispatch({
         type: 'stop_drag',
       });
-      dropCallback();
       window.removeEventListener('mouseup', dropItem, true);
     },
-    [dispatch, dropCallback],
+    [dispatch],
   );
   const selectItem = useCallback(
     (e: SyntheticMouseEvent<>): void => {
@@ -48,14 +49,14 @@ const useToolbarItem = (item: Item, dropCallback: any): DragReturn => {
   );
   useEffect(
     (): void => {
-      if (!dragging) {
+      if (!draggingGlobal) {
         return;
       }
       window.addEventListener('mouseup', dropItem, true);
     },
-    [dragging, dropItem],
+    [draggingGlobal, dropItem],
   );
-  return {dragging, mouseX, mouseY, selectItem};
+  return {dragging, mouseX, mouseY, select: selectItem};
 }
 
 export default useToolbarItem;

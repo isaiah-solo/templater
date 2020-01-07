@@ -11,30 +11,15 @@ const COPY_HEIGHT = 20;
 
 function TextItem(): Element<typeof React.Fragment> {
   const {
-    isToggled: draggingThisItem,
-    toggleFalse: dropThisItem,
-    toggleTrue: dragThisItem,
-  } = useToggle(false);
-  const {
     dragging,
     mouseX,
     mouseY,
-    selectItem,
-  } = useToolbarItem(
-    {
-      id: 'hover',
-      text: '',
-      type: 'text',
-    },
-    dropThisItem,
-  );
-  const selectThisItem = useCallback(
-    (e: SyntheticMouseEvent<>): void => {
-      dragThisItem();
-      selectItem(e);
-    },
-    [dragThisItem, selectItem],
-  );
+    select,
+  } = useToolbarItem({
+    id: 'hover',
+    text: '',
+    type: 'text',
+  });
   const hoveringItem = useMemo(
     (): Element<'div'> => (
       <div style={{
@@ -52,8 +37,8 @@ function TextItem(): Element<typeof React.Fragment> {
   );
   return (
     <>
-      {dragging && draggingThisItem && hoveringItem}
-      <div onMouseDown={selectThisItem} style={styles.root}>
+      {dragging && hoveringItem}
+      <div onMouseDown={select} style={styles.root}>
         Text
       </div>
     </>

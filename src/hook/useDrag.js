@@ -6,7 +6,7 @@ import useThrottle from './useThrottle';
 import useToggle from './useToggle';
 
 type DragReturn = $ReadOnly<{|
-  isSelected: boolean,
+  dragging: boolean,
   mouseX: ?number,
   mouseY: ?number,
   select: (e: SyntheticMouseEvent<>) => void,
@@ -14,7 +14,7 @@ type DragReturn = $ReadOnly<{|
 
 const useDrag = (): DragReturn => {
   const {
-    isToggled: isSelected,
+    isToggled: dragging,
     toggleFalse: endDrag,
     toggleTrue: startDrag,
   } = useToggle(false);
@@ -24,7 +24,7 @@ const useDrag = (): DragReturn => {
   const dragItem = useCallback(
     throttle(
       ({clientX, clientY}: SyntheticMouseEvent<>): void => {
-        if (!isSelected) {
+        if (!dragging) {
           return;
         }
         setMouseX(clientX);
@@ -33,7 +33,7 @@ const useDrag = (): DragReturn => {
       100,
     ),
     [
-      isSelected,
+      dragging,
       setMouseX,
       setMouseY,
     ],
@@ -67,14 +67,14 @@ const useDrag = (): DragReturn => {
   );
   useEffect(
     (): void => {
-      if (isSelected) {
+      if (dragging) {
         window.addEventListener('mouseup', dropItem, true);
         window.addEventListener('mousemove', dragItem, true);
       }
     },
-    [dragItem, dropItem, isSelected],
+    [dragItem, dropItem, dragging],
   );
-  return {isSelected, mouseX, mouseY, select};
+  return {dragging, mouseX, mouseY, select};
 }
 
 export default useDrag;
