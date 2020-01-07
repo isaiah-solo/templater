@@ -5,7 +5,7 @@ import type {ElementRef} from 'react';
 import type {Item, State} from './workspaceItemReducer';
 
 import {useCallback, useState} from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 
 export const GAP = 12;
 export const ITEM_HEIGHT = 40;
@@ -19,7 +19,6 @@ type ItemsReturn = $ReadOnly<{|
 
 function useWorkplaceItems(ref: ElementRef<any>): ItemsReturn {
   const current = ref.current;
-  const dispatch = useDispatch();
   const [mouseY, setMouseY] = useState<?number>(null);
   const draggingNewItem = useSelector((state?: State): boolean => {
     return state !== undefined
