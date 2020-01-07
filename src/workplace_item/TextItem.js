@@ -62,8 +62,8 @@ function TextItem({
     [dispatch, id],
   );
   const enteredOrEscaped = useCallback(
-    (e: SyntheticKeyboardEvent<>): void => {
-      if (e.key !== 'Enter' && e.key !== 'Escape') {
+    ({key}: SyntheticKeyboardEvent<>): void => {
+      if (key !== 'Enter' && key !== 'Escape') {
         return;
       }
       disableEditMode();
