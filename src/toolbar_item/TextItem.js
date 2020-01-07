@@ -2,10 +2,9 @@
 
 import type {Element} from 'react';
 
-import React, {useCallback, useMemo} from 'react';
+import React, {useMemo} from 'react';
 
 import useToolbarItem from './useToolbarItem';
-import useToggle from '../hook/useToggle';
 
 const COPY_HEIGHT = 20;
 

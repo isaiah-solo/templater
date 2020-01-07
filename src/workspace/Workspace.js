@@ -3,7 +3,7 @@
 import type {Element} from 'react';
 import type {Item, ItemType} from '../reducer/workspaceItemReducer';
 
-import React, {useCallback, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useDispatch} from "react-redux";
 
 import PlaceholderItem from '../workspace_item/PlaceholderItem.js';
@@ -41,6 +41,13 @@ function Workspace(): Element<typeof React.Fragment> {
     hoverOut,
     items,
   } = useWorkspaceItems(workspaceRef);
+  const dropItemFromHere = useCallback(
+    (): void => {
+      dropFromHere();
+      window.removeEventListener('mouseup', dropItemFromHere, true);
+    },
+    [dropFromHere],
+  );
   const dropItemAt = useCallback(
     (index: number): MouseFunc => {
       return (_: SyntheticMouseEvent<>): void => {
@@ -102,6 +109,15 @@ function Workspace(): Element<typeof React.Fragment> {
       }} />
     ),
     [mouseX, mouseY],
+  );
+  useEffect(
+    (): void => {
+      if (!draggingFromHere) {
+        return;
+      }
+      window.addEventListener('mouseup', dropItemFromHere, true);
+    },
+    [draggingFromHere, dropItemFromHere],
   );
   return (
     <>

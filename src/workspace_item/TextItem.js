@@ -4,7 +4,7 @@ import type {Element} from 'react';
 
 import type {Item, State} from '../reducer/workspaceItemReducer';
 
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback} from 'react';
 import {FaGripVertical, FaTimes} from 'react-icons/fa';
 import {useDispatch, useSelector} from "react-redux";
 
