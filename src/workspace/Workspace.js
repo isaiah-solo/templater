@@ -8,8 +8,8 @@ import {useDispatch} from "react-redux";
 
 import PlaceholderItem from '../workspace_item/PlaceholderItem.js';
 import TextItem from '../workspace_item/TextItem.js';
-import useWorkspaceItems, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceItems';
-import useWorkspaceItem from '../workspace_item/useWorkspaceItem';
+import useWorkspaceReducer, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceReducer';
+import useWorkspace from './useWorkspace';
 
 type ItemElementType = typeof PlaceholderItem
   | typeof TextItem;
@@ -26,15 +26,14 @@ function Workspace(): Element<typeof React.Fragment> {
   const workspaceRef = useRef(null);
   const {
     dragging,
-    mouseX,
-    mouseY,
+    positionStyle,
     selectItemFor,
-  } = useWorkspaceItem();
+  } = useWorkspace();
   const {
     hover,
     hoverOut,
     items,
-  } = useWorkspaceItems(workspaceRef);
+  } = useWorkspaceReducer(workspaceRef);
   const dropItemAt = useCallback(
     (index: number): MouseFunc => {
       return (_: SyntheticMouseEvent<>): void => {
@@ -73,19 +72,16 @@ function Workspace(): Element<typeof React.Fragment> {
     [dropItemAt, items, selectItemFor],
   );
   const hoveringItem = useMemo(
-    (): Element<'div'> => (
-      <div style={{
-        ...styles.item,
-        ...styles.copy,
-        left: mouseX,
-        top: (
-          mouseY != null
-            ? mouseY - COPY_HEIGHT - 10
-            : null
-        ),
-      }} />
-    ),
-    [mouseX, mouseY],
+    (): Element<'div'> => {
+      return (
+        <div style={{
+          ...styles.item,
+          ...styles.copy,
+          ...positionStyle,
+        }} />
+      );
+    },
+    [positionStyle],
   );
   return (
     <>

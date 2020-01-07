@@ -17,7 +17,7 @@ type ItemsReturn = $ReadOnly<{|
   items: Array<Item>,
 |}>;
 
-function useWorkplaceItems(ref: ElementRef<any>): ItemsReturn {
+function useWorkspaceReducer(ref: ElementRef<any>): ItemsReturn {
   const current = ref.current;
   const [mouseY, setMouseY] = useState<?number>(null);
   const draggingNewItem = useSelector((state?: State): boolean => {
@@ -71,4 +71,4 @@ function useWorkplaceItems(ref: ElementRef<any>): ItemsReturn {
   return {hover, hoverOut, items};
 }
 
-export default useWorkplaceItems;
+export default useWorkspaceReducer;

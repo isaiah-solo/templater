@@ -4,7 +4,7 @@ import type {Element} from 'react';
 
 import type {Item, State} from '../reducer/workspaceItemReducer';
 
-import React, {useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {FaGripVertical, FaTimes} from 'react-icons/fa';
 import {useDispatch, useSelector} from "react-redux";
 
@@ -30,15 +30,9 @@ function TextItem({
           return item.id === id;
         }) ?? null
       : null;
-    let currentText = item != null
+    return item != null
       ? item.text ?? ''
       : '';
-    currentText = currentText.length > 0
-      ? currentText
-      : 'Click to add text...';
-    return currentText.length > 50
-      ? currentText.slice(0, 50) + '...'
-      : currentText;
   });
   const {
     isToggled: inEditMode,
@@ -78,6 +72,17 @@ function TextItem({
     },
     [disableEditMode],
   );
+  const displayText = useMemo(
+    (): string => {
+      let currentText = text.length > 0
+        ? text
+        : 'Click to add text...';
+      return currentText.length > 50
+        ? currentText.slice(0, 50) + '...'
+        : currentText;
+    },
+    [text],
+  );
   return (
     <div onBlur={disableEditMode}
       onClick={enableEditMode}
@@ -101,7 +106,7 @@ function TextItem({
             value={text} />
         ) : (
           <span style={styles.text}>
-            {text}
+            {displayText}
           </span>
         )}
       </div>

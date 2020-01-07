@@ -2,20 +2,25 @@
 
 import type {State} from '../reducer/workspaceItemReducer';
 
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 
 import useDrag from '../hook/useDrag';
 
 type MouseFunc = (e: SyntheticMouseEvent<>) => void;
+type PositionStyle = $ReadOnly<{|
+  left: number,
+  top: number,
+|}>;
 type DragReturn = $ReadOnly<{|
   dragging: boolean,
-  mouseX: ?number,
-  mouseY: ?number,
+  positionStyle: ?PositionStyle,
   selectItemFor: (id: string) => MouseFunc,
 |}>;
 
-const useWorkspaceItem = (): DragReturn => {
+const COPY_HEIGHT = 20;
+
+const useWorkspace = (): DragReturn => {
   const dispatch = useDispatch();
   const draggingGlobal = useSelector((state?: State): boolean => {
     return state !== undefined
@@ -49,6 +54,16 @@ const useWorkspaceItem = (): DragReturn => {
     },
     [dispatch, select],
   );
+  const positionStyle = useMemo(
+    (): ?PositionStyle => {
+      return mouseX != null && mouseY != null
+        ? ({
+          left: mouseX,
+          top: mouseY - COPY_HEIGHT - 10,
+        }) : null;
+    },
+    [mouseX, mouseY],
+  );
   useEffect(
     (): void => {
       if (!draggingGlobal) {
@@ -58,7 +73,7 @@ const useWorkspaceItem = (): DragReturn => {
     },
     [draggingGlobal, dropItem],
   );
-  return {dragging, mouseX, mouseY, selectItemFor};
+  return {dragging, positionStyle, selectItemFor};
 }
 
-export default useWorkspaceItem;
+export default useWorkspace;
