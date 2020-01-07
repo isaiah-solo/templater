@@ -81,7 +81,8 @@ function TextItem({
   );
   const displayText = useMemo(
     (): string => {
-      return text.length > 0 ? text : 'Click to add text...';
+      const currentText = text.length > 0 ? text : 'Click to add text...';
+      return currentText.length > 50 ? currentText.slice(0, 50) + '...' : currentText;
     },
     [text],
   );
@@ -112,7 +113,7 @@ function TextItem({
           </span>
         )}
       </div>
-      {showingDelete && (
+      {(showingDelete || inEditMode) && (
         <div onClick={deleteItem}
           style={styles.deleteIcon}>
           <FaTimes />
@@ -150,15 +151,18 @@ const styles = {
     alignItems: 'center',
     boxSizing: 'border-box',
     display: 'flex',
+    flexGrow: 1,
   },
   input: {
     backgroundColor: '#ee0060',
     borderWidth: 0,
     color: 'white',
+    flexGrow: 1,
     fontSize: 16,
     outlineWidth: 0,
     padding: 0,
     textDecoration: 'underline',
+    width: '100%',
   },
 };
 

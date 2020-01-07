@@ -46,6 +46,7 @@ const styles = {
     height: '100%',
     padding: PADDING,
     width: '100%',
+    wordBreak: 'break-all',
   },
 };
 
