@@ -1,14 +1,16 @@
 // @flow strict
 
 import type {Element} from 'react';
-import type {MouseFunc} from '../workplace_item/TextItem.js';
+import type {MouseFunc} from '../workspace_item/TextItem';
 import type {Item, ItemType} from '../reducer/workspaceItemReducer';
+
 import React, {useCallback, useMemo, useRef} from 'react';
 import {useDispatch} from "react-redux";
-import PlaceholderItem from '../workplace_item/PlaceholderItem.js';
-import TextItem from '../workplace_item/TextItem.js';
+
+import PlaceholderItem from '../workspace_item/PlaceholderItem.js';
+import TextItem from '../workspace_item/TextItem.js';
 import useWorkspaceItems, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceItems';
-import useWorkspaceItem from '../workplace_item/useWorkspaceItem';
+import useWorkspaceItem from '../workspace_item/useWorkspaceItem';
 import useToggle from '../hook/useToggle';
 
 type ItemElementType = typeof PlaceholderItem
