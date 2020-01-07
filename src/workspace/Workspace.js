@@ -1,7 +1,6 @@
 // @flow strict
 
 import type {Element} from 'react';
-import type {MouseFunc} from '../workspace_item/TextItem';
 import type {Item, ItemType} from '../reducer/workspaceItemReducer';
 
 import React, {useCallback, useMemo, useRef} from 'react';
@@ -15,6 +14,7 @@ import useToggle from '../hook/useToggle';
 
 type ItemElementType = typeof PlaceholderItem
   | typeof TextItem;
+type MouseFunc = (e: SyntheticMouseEvent<>) => void;
 
 const COPY_HEIGHT = 20;
 const ITEM_MAP: {[ItemType]: ItemElementType} = {
@@ -77,7 +77,6 @@ function Workspace(): Element<typeof React.Fragment> {
             }
             height={ITEM_HEIGHT}
             id={id}
-            index={index}
             key={index}
             onMouseUp={
               type === 'placeholder'

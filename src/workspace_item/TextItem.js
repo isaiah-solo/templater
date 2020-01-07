@@ -10,14 +10,11 @@ import {useDispatch, useSelector} from "react-redux";
 
 import useToggle from '../hook/useToggle';
 
-export type MouseFunc = (e: SyntheticMouseEvent<>) => void;
-
 type Props = $ReadOnly<{|
-  grip?: MouseFunc,
+  grip?: (e: SyntheticMouseEvent<>) => void,
   height: number,
   id: string,
-  index: number,
-  onMouseUp?: MouseFunc,
+  onMouseUp?: (e: SyntheticMouseEvent<>) => void,
 |}>;
 
 function TextItem({
@@ -27,19 +24,21 @@ function TextItem({
   onMouseUp,
 }: Props): Element<'div'> {
   const dispatch = useDispatch();
-  const findItem = useCallback(
-    (item: Item): boolean => {
-      return item.id === id;
-    },
-    [id],
-  );
   const text = useSelector((state?: State): string => {
     const item = state !== undefined
-      ? state.items.find(findItem) ?? null
+      ? state.items.find((item: Item): boolean => {
+          return item.id === id;
+        }) ?? null
       : null;
-    return item != null
+    let currentText = item != null
       ? item.text ?? ''
       : '';
+    currentText = currentText.length > 0
+      ? currentText
+      : 'Click to add text...';
+    return currentText.length > 50
+      ? currentText.slice(0, 50) + '...'
+      : currentText;
   });
   const {
     isToggled: inEditMode,
@@ -61,15 +60,6 @@ function TextItem({
     },
     [dispatch, id],
   );
-  const enteredOrEscaped = useCallback(
-    ({key}: SyntheticKeyboardEvent<>): void => {
-      if (key !== 'Enter' && key !== 'Escape') {
-        return;
-      }
-      disableEditMode();
-    },
-    [disableEditMode],
-  );
   const deleteItem = useCallback(
     (e: SyntheticMouseEvent<>): void => {
       dispatch({
@@ -79,12 +69,14 @@ function TextItem({
     },
     [dispatch, id],
   );
-  const displayText = useMemo(
-    (): string => {
-      const currentText = text.length > 0 ? text : 'Click to add text...';
-      return currentText.length > 50 ? currentText.slice(0, 50) + '...' : currentText;
+  const enteredOrEscaped = useCallback(
+    ({key}: SyntheticKeyboardEvent<>): void => {
+      if (key !== 'Enter' && key !== 'Escape') {
+        return;
+      }
+      disableEditMode();
     },
-    [text],
+    [disableEditMode],
   );
   return (
     <div onBlur={disableEditMode}
@@ -108,8 +100,8 @@ function TextItem({
             type="text"
             value={text} />
         ) : (
-          <span style={styles.displayText}>
-            {displayText}
+          <span style={styles.text}>
+            {text}
           </span>
         )}
       </div>
@@ -140,9 +132,6 @@ const styles = {
     height: 16,
     width: 16,
   },
-  displayText: {
-    userSelect: 'none',
-  },
   gripIcon: {
     cursor: 'pointer',
     marginRight: 10,
@@ -156,6 +145,7 @@ const styles = {
   input: {
     backgroundColor: '#ee0060',
     borderWidth: 0,
+    boxSizing: 'border-box',
     color: 'white',
     flexGrow: 1,
     fontSize: 16,
@@ -163,6 +153,10 @@ const styles = {
     padding: 0,
     textDecoration: 'underline',
     width: '100%',
+  },
+  text: {
+    boxSizing: 'border-box',
+    userSelect: 'none',
   },
 };
 

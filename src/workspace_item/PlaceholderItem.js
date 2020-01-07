@@ -3,14 +3,11 @@
 import type {Element} from 'react';
 import React from 'react';
 
-export type MouseFunc = (e: SyntheticMouseEvent<>) => void;
-
 type Props = $ReadOnly<{|
-  grip?: MouseFunc,
+  grip?: (e: SyntheticMouseEvent<>) => void,
   height: number,
   id: string,
-  index: number,
-  onMouseUp?: MouseFunc,
+  onMouseUp?: (e: SyntheticMouseEvent<>) => void,
 |}>;
 
 function PlaceholderItem({
