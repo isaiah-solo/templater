@@ -7,16 +7,13 @@ type Props = $ReadOnly<{|
   grip?: (e: SyntheticMouseEvent<>) => void,
   height: number,
   id: string,
-  onMouseUp?: (e: SyntheticMouseEvent<>) => void,
 |}>;
 
 function PlaceholderItem({
   height,
-  onMouseUp,
 }: Props): Element<'div'> {
   return (
-    <div onMouseUp={onMouseUp}
-      style={{
+    <div style={{
         ...styles.root,
         height,
       }} />

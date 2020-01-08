@@ -33,17 +33,22 @@ function Workspace(): Element<typeof React.Fragment> {
     hover,
     hoverOut,
     items,
+    placeholderIndex,
   } = useWorkspaceReducer(workspaceRef);
   const dropItemAt = useCallback(
-    (index: number): MouseFunc => {
-      return (_: SyntheticMouseEvent<>): void => {
+    (index: ?number): MouseFunc => {
+      return (e: SyntheticMouseEvent<>): void => {
+        if (index == null) {
+          return;
+        }
+        hoverOut(e);
         dispatch({
           index,
           type: 'end_drag',
         });
       };
     },
-    [dispatch],
+    [dispatch, hoverOut],
   );
   const itemElements = useMemo(
     (): Array<Element<ItemElementType>> => {
@@ -60,16 +65,11 @@ function Workspace(): Element<typeof React.Fragment> {
             }
             height={ITEM_HEIGHT}
             id={id}
-            key={index}
-            onMouseUp={
-              type === 'placeholder'
-                ? dropItemAt(index)
-                : undefined
-            } />
+            key={index} />
         );
       })
     },
-    [dropItemAt, items, selectItemFor],
+    [items, selectItemFor],
   );
   const hoveringItem = useMemo(
     (): Element<'div'> => {
@@ -88,7 +88,7 @@ function Workspace(): Element<typeof React.Fragment> {
       {dragging && hoveringItem}
       <div onMouseLeave={hoverOut}
         onMouseMove={hover}
-        onMouseUp={hoverOut}
+        onMouseUp={dropItemAt(placeholderIndex)}
         ref={workspaceRef}
         style={styles.root}>
         {itemElements}

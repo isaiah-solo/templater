@@ -14,14 +14,12 @@ type Props = $ReadOnly<{|
   grip?: (e: SyntheticMouseEvent<>) => void,
   height: number,
   id: string,
-  onMouseUp?: (e: SyntheticMouseEvent<>) => void,
 |}>;
 
 function TextItem({
   grip,
   height,
   id,
-  onMouseUp,
 }: Props): Element<'div'> {
   const dispatch = useDispatch();
   const text = useSelector((state?: State): string => {
@@ -63,7 +61,7 @@ function TextItem({
     },
     [dispatch, id],
   );
-  const enteredOrEscaped = useCallback(
+  const onEnterOrEscape = useCallback(
     ({key}: SyntheticKeyboardEvent<>): void => {
       if (key !== 'Enter' && key !== 'Escape') {
         return;
@@ -88,7 +86,6 @@ function TextItem({
       onClick={enableEditMode}
       onMouseEnter={showDelete}
       onMouseLeave={hideDelete}
-      onMouseUp={onMouseUp}
       style={{
         ...styles.root,
         height,
@@ -100,7 +97,7 @@ function TextItem({
           <input autoFocus
             onBlur={disableEditMode}
             onChange={changeText}
-            onKeyDown={enteredOrEscaped}
+            onKeyDown={onEnterOrEscape}
             style={styles.input}
             type="text"
             value={text} />
@@ -138,14 +135,9 @@ const styles = {
     width: 16,
   },
   gripIcon: {
+    boxSizing: 'border-box',
     cursor: 'pointer',
     marginRight: 10,
-  },
-  leftItems: {
-    alignItems: 'center',
-    boxSizing: 'border-box',
-    display: 'flex',
-    flexGrow: 1,
   },
   input: {
     backgroundColor: '#ee0060',
@@ -158,6 +150,12 @@ const styles = {
     padding: 0,
     textDecoration: 'underline',
     width: '100%',
+  },
+  leftItems: {
+    alignItems: 'center',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexGrow: 1,
   },
   text: {
     boxSizing: 'border-box',

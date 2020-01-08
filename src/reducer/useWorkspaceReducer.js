@@ -11,10 +11,14 @@ export const GAP = 12;
 export const ITEM_HEIGHT = 40;
 export const PADDING = 20;
 
+type Items = $ReadOnly<{|
+  items: Array<Item>,
+  placeholderIndex: ?number,
+|}>;
 type ItemsReturn = $ReadOnly<{|
+  ...Items,
   hover: (e: SyntheticMouseEvent<>) => void,
   hoverOut: (e: SyntheticMouseEvent<>) => void,
-  items: Array<Item>,
 |}>;
 
 function useWorkspaceReducer(ref: ElementRef<any>): ItemsReturn {
@@ -25,12 +29,17 @@ function useWorkspaceReducer(ref: ElementRef<any>): ItemsReturn {
       ? state.draggingNewItem
       : false;
   });
-  const items = useSelector((state?: State): Array<Item> => {
+  const {items, placeholderIndex} = useSelector((state?: State): Items => {
     const initItems = state !== undefined ? state.items : [];
     const placeholderItem = {id: 'placeholder', type: 'placeholder'};
     let items = [...initItems];
     if (mouseY == null) {
-      return [...initItems];
+      return {
+        items: [
+          ...initItems
+        ],
+        placeholderIndex: null,
+      };
     }
     const heightNoPadding = mouseY - PADDING - ITEM_HEIGHT;
     const placeholderIndex = Math.ceil(
@@ -41,11 +50,14 @@ function useWorkspaceReducer(ref: ElementRef<any>): ItemsReturn {
       placeholderIndex,
       items.length,
     );
-    return [
-      ...beginningItems,
-      placeholderItem,
-      ...endingItems,
-    ];
+    return {
+      items: [
+        ...beginningItems,
+        placeholderItem,
+        ...endingItems,
+      ],
+      placeholderIndex,
+    };
   });
   const hover = useCallback(
     (e: SyntheticMouseEvent<>): void => {
@@ -62,7 +74,7 @@ function useWorkspaceReducer(ref: ElementRef<any>): ItemsReturn {
     },
     [setMouseY],
   );
-  return {hover, hoverOut, items};
+  return {hover, hoverOut, items, placeholderIndex};
 }
 
 export default useWorkspaceReducer;
