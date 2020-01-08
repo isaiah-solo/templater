@@ -9,7 +9,6 @@ import {useDispatch} from "react-redux";
 import PlaceholderItem from '../workspace_item/PlaceholderItem.js';
 import TextItem from '../workspace_item/TextItem.js';
 import useWorkspaceReducer, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceReducer';
-import useWorkspace from './useWorkspace';
 
 type ItemElementType = typeof PlaceholderItem
   | typeof TextItem;
@@ -26,14 +25,12 @@ function Workspace(): Element<typeof React.Fragment> {
   const workspaceRef = useRef(null);
   const {
     dragging,
-    positionStyle,
-    selectItemFor,
-  } = useWorkspace();
-  const {
     hover,
     hoverOut,
     items,
     placeholderIndex,
+    positionStyle,
+    selectItemFor,
   } = useWorkspaceReducer(workspaceRef);
   const dropItemAt = useCallback(
     (index: ?number): MouseFunc => {
