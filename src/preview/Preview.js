@@ -2,13 +2,18 @@
 
 import type {Element} from 'react';
 
-import type {Item, State} from '../reducer/workspaceItemReducer';
+import type {Item, ItemType, State} from '../reducer/workspaceItemReducer';
 
 import React, {useMemo} from 'react';
 
 import {useSelector} from "react-redux";
 
 export const PADDING = 20;
+
+const STYLE_MAP: {[ItemType]: ItemElementType} = {
+  header: 'bold',
+  text: 'normal',
+};
 
 type Props = $ReadOnly<{||}>;
 
@@ -19,11 +24,11 @@ function Preview(_: Props): Element<'div'> {
   const itemElements = useMemo(
     (): Array<Element<'div'>> => {
       return items.map((
-        {text}: Item,
+        {text, type}: Item,
         index: number,
       ): Element<'div'> => {
         return (
-          <div key={index}>
+          <div key={index} style={{fontWeight: STYLE_MAP[type]}}>
             {text}
           </div>
         );

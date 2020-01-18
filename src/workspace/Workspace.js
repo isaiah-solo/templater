@@ -6,6 +6,7 @@ import type {Item, ItemType} from '../reducer/workspaceItemReducer';
 import React, {useCallback, useMemo, useRef} from 'react';
 import {useDispatch} from "react-redux";
 
+import HeaderItem from '../workspace_item/HeaderItem.js';
 import PlaceholderItem from '../workspace_item/PlaceholderItem.js';
 import TextItem from '../workspace_item/TextItem.js';
 import useWorkspaceReducer, {GAP, ITEM_HEIGHT, PADDING} from '../reducer/useWorkspaceReducer';
@@ -16,6 +17,7 @@ type MouseFunc = (e: SyntheticMouseEvent<>) => void;
 
 const COPY_HEIGHT = 20;
 const ITEM_MAP: {[ItemType]: ItemElementType} = {
+  header: HeaderItem,
   placeholder: PlaceholderItem,
   text: TextItem,
 };

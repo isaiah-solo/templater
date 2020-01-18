@@ -1,6 +1,7 @@
 // @flow strict
 
-export type ItemType = 'placeholder'
+export type ItemType = 'header'
+  | 'placeholder'
   | 'text';
 
 export type Item = $ReadOnly<{|
