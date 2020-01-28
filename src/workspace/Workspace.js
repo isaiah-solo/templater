@@ -4,7 +4,7 @@ import type {Element} from 'react';
 import type {Item, ItemType} from '../reducer/workspaceItemReducer';
 
 import React, {useCallback, useMemo, useRef} from 'react';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 import HeaderItem from '../workspace_item/HeaderItem.js';
 import PlaceholderItem from '../workspace_item/PlaceholderItem.js';
@@ -21,6 +21,11 @@ const ITEM_MAP: {[ItemType]: ItemElementType} = {
   placeholder: PlaceholderItem,
   text: TextItem,
 };
+const ITEM_COLOR_MAP: {[ItemType]: ?ItemElementType} = {
+  header: '#0cbfe9',
+  placeholder: null,
+  text: '#ee0060',
+};
 
 function Workspace(): Element<typeof React.Fragment> {
   const dispatch = useDispatch();
@@ -34,6 +39,7 @@ function Workspace(): Element<typeof React.Fragment> {
     positionStyle,
     selectItemFor,
   } = useWorkspaceReducer(workspaceRef);
+  const hoveredItem = useSelector(state => state?.hoveredItem);
   const dropItemAt = useCallback(
     (index: ?number): MouseFunc => {
       return (e: SyntheticMouseEvent<>): void => {
@@ -77,10 +83,11 @@ function Workspace(): Element<typeof React.Fragment> {
           ...styles.item,
           ...styles.copy,
           ...positionStyle,
+          backgroundColor: ITEM_COLOR_MAP[hoveredItem?.type]
         }} />
       );
     },
-    [positionStyle],
+    [hoveredItem, positionStyle],
   );
   return (
     <>
